@@ -1,4 +1,6 @@
-﻿namespace Imposter.Core.DSL
+﻿using System;
+
+namespace FluentImposter.Core.DSL
 {
     public interface IImposterBuilder
     {
@@ -15,6 +17,11 @@
         }
         public ImposterHostBuilder HasAnImposter(string name)
         {
+            _imposterHostBuilder
+                    .AddImposter(string.IsNullOrEmpty(name)
+                                     ? new Entities.Imposter(Guid.NewGuid().ToString())
+                                     : new Entities.Imposter(name));
+
             return _imposterHostBuilder;
         }
     }

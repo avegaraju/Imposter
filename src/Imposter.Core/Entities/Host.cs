@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Imposter.Core.Entities
+namespace FluentImposter.Core.Entities
 {
     public class Host
     {

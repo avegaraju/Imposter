@@ -64,16 +64,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImposterHostBuilderTests.cs" />
+    <Compile Include="DSL\ImposterBuilderTests.cs" />
+    <Compile Include="DSL\ImposterHostBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Imposter.Core\Imposter.Core.csproj">
+    <ProjectReference Include="..\..\src\Imposter.Core\FluentImposter.Core.csproj">
       <Project>{633044e5-4073-4bca-a79e-8e8f5e3af3c4}</Project>
-      <Name>Imposter.Core</Name>
+      <Name>FluentImposter.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

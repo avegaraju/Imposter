@@ -60,7 +60,7 @@ namespace Imposter.Core.Tests.Unit.DSL
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("");
+                    .HasAnImposter("", i => { });
 
             imposterHostBuilder
                     .Should().BeOfType<ImposterHostBuilder>();
@@ -71,7 +71,7 @@ namespace Imposter.Core.Tests.Unit.DSL
         {
             var imposterHost = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("")
+                    .HasAnImposter("", i => { })
                     .Create();
 
             imposterHost

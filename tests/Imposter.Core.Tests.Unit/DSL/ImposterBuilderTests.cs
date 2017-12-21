@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 
 using FluentImposter.Core.DSL;
+using FluentImposter.Core.Entities;
 
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace Imposter.Core.Tests.Unit.DSL
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("");
+                    .HasAnImposter("", i =>{});
 
             var imposter = imposterHostBuilder.Imposters.First();
 
@@ -33,7 +34,7 @@ namespace Imposter.Core.Tests.Unit.DSL
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter(null);
+                    .HasAnImposter(null, i => { });
 
             var imposter = imposterHostBuilder.Imposters.First();
 
@@ -50,11 +51,28 @@ namespace Imposter.Core.Tests.Unit.DSL
 
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter(expectedImposterName);
+                    .HasAnImposter(expectedImposterName, i => { });
 
             var imposter = imposterHostBuilder.Imposters.First();
 
             imposter.Name.Should().Be(expectedImposterName);
+        }
+
+        [Fact]
+        public void HasAnImposter_ImposterOfTypeRestCanBeCreated()
+        {
+            var imposterHostBuilder = new ImposterHostBuilder()
+                    .HostedOn(_testUri)
+                    .HasAnImposter("test",
+                                   imposter =>
+                                   {
+                                       imposter.IsOfType(ImposterType.REST);
+                                   });
+
+            var firstImposter = imposterHostBuilder.Imposters.First();
+
+            firstImposter.Type
+                .Should().Be(ImposterType.REST);
         }
     }
 }

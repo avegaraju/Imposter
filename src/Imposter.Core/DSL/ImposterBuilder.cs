@@ -1,10 +1,13 @@
 ﻿using System;
 
+using FluentImposter.Core.Entities;
+
 namespace FluentImposter.Core.DSL
 {
     public interface IImposterBuilder
     {
-        ImposterHostBuilder HasAnImposter(string name);
+        ImposterHostBuilder HasAnImposter(string name,
+                                          Action<ImposterDefinition> imposterDefinitionAction);
     }
 
     public class ImposterBuilder: IImposterBuilder
@@ -15,13 +18,19 @@ namespace FluentImposter.Core.DSL
         {
             _imposterHostBuilder = imposterHostBuilder;
         }
-        public ImposterHostBuilder HasAnImposter(string name)
-        {
-            _imposterHostBuilder
-                    .AddImposter(string.IsNullOrEmpty(name)
-                                     ? new Entities.Imposter(Guid.NewGuid().ToString())
-                                     : new Entities.Imposter(name));
 
+        public ImposterHostBuilder HasAnImposter(string name,
+                                                 Action<ImposterDefinition> imposterDefinitionAction)
+        {
+            var imposter = string.IsNullOrEmpty(name)
+                               ? new Imposter(Guid.NewGuid().ToString())
+                               : new Imposter(name);
+
+            var imposterDefinition = new ImposterDefinition(imposter);
+            imposterDefinitionAction(imposterDefinition);
+
+            _imposterHostBuilder.AddImposter(imposter);
+            
             return _imposterHostBuilder;
         }
     }

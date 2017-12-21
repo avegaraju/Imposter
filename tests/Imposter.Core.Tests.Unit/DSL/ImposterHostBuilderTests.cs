@@ -2,12 +2,11 @@
 
 using FluentAssertions;
 
-using FluentImposter.Core;
 using FluentImposter.Core.DSL;
 
 using Xunit;
 
-namespace Imposter.Core.Tests.Unit.DSL
+namespace FluentImposter.Core.Tests.Unit.DSL
 {
     /// ////////////////////////////////////////////////////////////////
     //End goal of the DSL

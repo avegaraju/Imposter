@@ -8,7 +8,7 @@ using FluentImposter.Core.Entities;
 
 using Xunit;
 
-namespace Imposter.Core.Tests.Unit.DSL
+namespace FluentImposter.Core.Tests.Unit.DSL
 {
     public class ImposterBuilderTests
     {

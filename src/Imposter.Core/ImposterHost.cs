@@ -1,6 +1,6 @@
-﻿using Imposter.Core.Entities;
+﻿using FluentImposter.Core.Entities;
 
-namespace Imposter.Core
+namespace FluentImposter.Core
 {
     public interface IImposterHost
     {

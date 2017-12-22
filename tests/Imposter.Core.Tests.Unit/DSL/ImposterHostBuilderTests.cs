@@ -2,11 +2,11 @@
 
 using FluentAssertions;
 
-using Imposter.Core.DSL;
+using FluentImposter.Core.DSL;
 
 using Xunit;
 
-namespace Imposter.Core.Tests.Unit
+namespace FluentImposter.Core.Tests.Unit.DSL
 {
     /// ////////////////////////////////////////////////////////////////
     //End goal of the DSL
@@ -59,7 +59,7 @@ namespace Imposter.Core.Tests.Unit
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("");
+                    .HasAnImposter("", i => { });
 
             imposterHostBuilder
                     .Should().BeOfType<ImposterHostBuilder>();
@@ -70,7 +70,7 @@ namespace Imposter.Core.Tests.Unit
         {
             var imposterHost = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("")
+                    .HasAnImposter("", i => { })
                     .Create();
 
             imposterHost

@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
-using Imposter.Core.Entities;
+using FluentImposter.Core.Entities;
 
-namespace Imposter.Core.DSL
+namespace FluentImposter.Core.DSL
 {
     public class ImposterHostBuilder
     {
         private Host _host;
+        private readonly List<Imposter> _imposters = new List<Imposter>();
+
+        public IReadOnlyCollection<Imposter> Imposters => _imposters;
 
         public ImposterHost Create()
         {
@@ -18,6 +22,11 @@ namespace Imposter.Core.DSL
             _host = new Host(uri);
 
             return new ImposterBuilder(this);
+        }
+
+        internal void AddImposter(Imposter imposter)
+        {
+            _imposters.Add(imposter);
         }
     }
 }

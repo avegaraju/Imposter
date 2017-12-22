@@ -48,6 +48,13 @@ Task("Restore")
 
         DotNetCoreRestore(solution.ToString());
     }
+
+    foreach(var solution in solutions)
+    {
+        Information("Restoring {0}...", solution);
+
+         NuGetRestore(solution);
+    }
 });
 
 Task("Build")

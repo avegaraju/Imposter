@@ -4,7 +4,7 @@
     {
         public ILeftConditionExpression<T> When<T>()
         {
-            return new LeftConditionExpression<T>();
+            return new LeftConditionExpression<T>(this);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -20,22 +21,60 @@ namespace FluentImposter.RuleEngine.Tests
         }
 
         [Fact]
-        public void When_IsTrue_AllowsToAddExpressionToExpressionData()
+        public void When_IsTrue_AddsLeftConditionExpressionToExpressionData()
         {
+            var expressionBuilder = new ExpressionBuilder();
+            var leftConditionExpression = expressionBuilder
+                    .When<Request>()
+                    .IsTrue(request => request.Body.Content.Contains("")
+                                       && request.Body.Content.Contains(""));
+
             Expression<Func<Request, bool>> expectedExpression
                     = request => request.Body.Content.Contains("")
                                  && request.Body.Content.Contains("");
 
-
-            var expressionBuilder = new ExpressionBuilder();
-            var leftConditionExpression = expressionBuilder
-                    .When<Request>()
-                    .IsTrue(expectedExpression);
-
-
             leftConditionExpression.ExpressionData
                                    .LeftConditionExpressions.First()
-                                   .Should().Be(expectedExpression);
+                                   .Should().BeEquivalentTo(expectedExpression);
+        }
+
+        [Fact]
+        public void When_IsTrue_And_SetsExpressionTypeToAndInExpressionData()
+        {
+            var expressionBuilder = new ExpressionBuilder();
+            var rightConditionExpression = expressionBuilder
+                    .When<Request>()
+                    .IsTrue(request => request.Body.Content.Contains("")
+                                       && request.Body.Content.Contains(""))
+                    .And;
+
+            rightConditionExpression.ExpressionData
+                                    .ConditionExpressionType.Should().Be(ExpressionType.And);
+        }
+
+        [Fact]
+        public void When_IsTrue_And_AddsRightConditionExpressionToExpressionData()
+        {
+            var expressionBuilder = new ExpressionBuilder();
+            var rightConditionExpression = expressionBuilder
+                    .When<Request>()
+                    .IsTrue(request => request.Body.Content.Contains("")
+                                       && request.Body.Content.Contains(""))
+                    .And
+                    .IsTrue(request => request.Body.Content.Contains(""));
+
+            Expression<Func<Request, bool>> expectedExpression
+                    = request => request.Body.Content.Contains("");
+
+            rightConditionExpression.ExpressionData
+                                    .RightConditionExpression.First()
+                                    .Should().BeEquivalentTo(expectedExpression);
+        }
+
+        [Fact]
+        public void ExpressionEvaluator_Evaluates_ExpressionDataCorrectly()
+        {
+            
         }
     }
 

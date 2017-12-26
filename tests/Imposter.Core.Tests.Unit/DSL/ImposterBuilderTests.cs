@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Net.Cache;
 
 using FluentAssertions;
 
@@ -19,11 +21,11 @@ namespace FluentImposter.Core.Tests.Unit.DSL
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("", i =>{});
+                    .HasAnImposter("", i => { });
 
             var imposter = imposterHostBuilder.Imposters.First();
 
-            Action action =()=> Guid.Parse(imposter.Name);
+            Action action = () => Guid.Parse(imposter.Name);
 
             action.Should().NotThrow<ArgumentNullException>();
             action.Should().NotThrow<FormatException>();
@@ -72,7 +74,61 @@ namespace FluentImposter.Core.Tests.Unit.DSL
             var firstImposter = imposterHostBuilder.Imposters.First();
 
             firstImposter.Type
-                .Should().Be(ImposterType.REST);
+                         .Should().Be(ImposterType.REST);
+        }
+
+        [Fact]
+        public void HasAnImposter_ImposterConditionsAreCorrectlyAddedToImposter()
+        {
+            var imposterHostBuilder = new ImposterHostBuilder()
+                    .HostedOn(_testUri)
+                    .HasAnImposter("test",
+                                   imposter =>
+                                   {
+                                       DefaultResponseCreator creator = new DefaultResponseCreator();
+
+                                       imposter.IsOfType(ImposterType.REST)
+                                               .When(r => r.Body.Content.Contains(""))
+                                               .Then(a => creator.Execute())
+                                               .Build();
+                                   });
+
+            var firstImposter = imposterHostBuilder.Imposters.First();
+
+            Expression<Func<Request, bool>> expectedCondition = r => r.Body.Content.Contains("");
+
+            firstImposter.Condition.Should().BeEquivalentTo(expectedCondition);
+        }
+
+        [Fact]
+        public void HasAnImposter_ImposterResponseIsCorrectlyAddedToImposter()
+        {
+            var imposterHostBuilder = new ImposterHostBuilder()
+                    .HostedOn(_testUri)
+                    .HasAnImposter("test",
+                                   imposter =>
+                                   {
+                                       DefaultResponseCreator creator = new DefaultResponseCreator();
+
+                                       imposter.IsOfType(ImposterType.REST)
+                                               .When(r => r.Body.Content.Contains(""))
+                                               .Then(a => creator.Execute())
+                                               .Build();
+                                   });
+
+            var firstImposter = imposterHostBuilder.Imposters.First();
+
+            Expression<Action<ResponseCreator>> expectedAction = a => a.Execute();
+
+            firstImposter.Action.Should().BeEquivalentTo(expectedAction);
+        }
+
+        public class DefaultResponseCreator: ResponseCreator
+        {
+            protected override Response CreateResponse()
+            {
+                return new Response();
+            }
         }
     }
 }

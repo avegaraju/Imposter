@@ -1,7 +1,7 @@
 ﻿namespace FluentImposter.RuleEngine
 {
-    public interface IActionExecutor
+    public interface IActionExecutor<out T>
     {
-        void Execute();
+        T Execute();
     }
 }

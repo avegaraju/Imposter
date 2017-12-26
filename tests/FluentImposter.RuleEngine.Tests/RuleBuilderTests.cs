@@ -14,10 +14,12 @@ namespace FluentImposter.RuleEngine.Tests
         [Fact]
         public void  When_AddsCorrectContionToRuleData()
         {
-            var ruleBuilder = new RuleBuilder<Request,ActionExecutor>();
+            var ruleBuilder = new RuleBuilder<Request,ActionExecutor,Response>();
+
+            IActionExecutor<Response> actionExecutor = new ActionExecutor();
 
             ruleBuilder.When(r => r.Body.Content.Contains(""))
-                       .Then(a => a.Execute())
+                       .Then(a => actionExecutor.Execute())
                        .Build();
 
             Expression<Func<Request, bool>> expectedCondition
@@ -30,10 +32,12 @@ namespace FluentImposter.RuleEngine.Tests
         [Fact]
         public void When_WithNullCondition_ThrowsArgumentNullException()
         {
-            var ruleBuilder = new RuleBuilder<Request, ActionExecutor>();
+            var ruleBuilder = new RuleBuilder<Request, ActionExecutor, Response>();
+
+            IActionExecutor<Response> actionExecutor = new ActionExecutor();
 
             Action exceptionAction = () => ruleBuilder.When(null)
-                                                      .Then(a => a.Execute())
+                                                      .Then(a=> actionExecutor.Execute())
                                                       .Build();
 
             exceptionAction.Should().Throw<ArgumentNullException>();
@@ -42,7 +46,7 @@ namespace FluentImposter.RuleEngine.Tests
         [Fact]
         public void Then_WithNullActionThrowsArgumentNullException()
         {
-            var ruleBuilder = new RuleBuilder<Request, ActionExecutor>();
+            var ruleBuilder = new RuleBuilder<Request, ActionExecutor,Response>();
 
             Action exceptionAction = () => ruleBuilder.When(r => r.Body.Content.Contains(""))
                                                       .Then(null)
@@ -53,15 +57,15 @@ namespace FluentImposter.RuleEngine.Tests
         [Fact]
         public void Then_WithValidActionAddsTheActionToRuleData()
         {
-            var ruleBuilder = new RuleBuilder<Request, ActionExecutor>();
+            var ruleBuilder = new RuleBuilder<Request, ActionExecutor, Response>();
 
-            IActionExecutor actionExecutor = new ActionExecutor();
+            IActionExecutor<Response> actionExecutor = new ActionExecutor();
 
             ruleBuilder.When(r => r.Body.Content.Contains(""))
                        .Then(a => actionExecutor.Execute())
                        .Build();
 
-            Expression<Action<ActionExecutor>> action = a => a.Execute();
+            Expression<Action<ActionExecutor>> action = a => actionExecutor.Execute();
 
             ruleBuilder.RuleData.ActionExecutor.Should().BeEquivalentTo(action);
         }
@@ -77,11 +81,16 @@ namespace FluentImposter.RuleEngine.Tests
         public string Content { get; set; }
     }
 
-    internal class ActionExecutor: IActionExecutor
+    internal class Response
     {
-        public void Execute()
+        public Body Body { get; set; }
+    }
+
+    internal class ActionExecutor: IActionExecutor<Response>
+    {
+        Response IActionExecutor<Response>.Execute()
         {
-            
+            return new Response();
         }
     }
 }

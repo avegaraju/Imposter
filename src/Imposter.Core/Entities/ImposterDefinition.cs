@@ -1,4 +1,6 @@
-﻿namespace FluentImposter.Core.Entities
+﻿using FluentImposter.Core.DSL;
+
+namespace FluentImposter.Core.Entities
 {
     public enum ImposterType
     {
@@ -13,11 +15,11 @@
         {
             _imposter = imposter;
         }
-        public ImposterDefinition IsOfType(ImposterType type)
+        public ImposterRuleBuilder IsOfType(ImposterType type)
         {
             _imposter.SetType(type);
 
-            return this;
+            return new ImposterRuleBuilder(_imposter);
         }
     }
 }

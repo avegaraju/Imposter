@@ -19,5 +19,10 @@ namespace FluentImposter.Core.Builders
 
             return new ImposterRuleAction(_imposter);
         }
+
+        public Imposter Build()
+        {
+            return _imposter;
+        }
     }
 }

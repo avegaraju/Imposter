@@ -13,7 +13,7 @@ namespace FluentImposter.Core.DSL
         {
             _imposter = imposter;
         }
-        public IBuilder Then(Expression<Action<ResponseCreator>> actionExecutor)
+        public IBuilder Then(Expression<Action<IResponseCreator>> actionExecutor)
         {
             _imposter.SetAction(actionExecutor);
 

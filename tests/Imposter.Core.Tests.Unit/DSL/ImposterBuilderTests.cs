@@ -89,7 +89,7 @@ namespace FluentImposter.Core.Tests.Unit.DSL
 
                                        imposter.IsOfType(ImposterType.REST)
                                                .When(r => r.Body.Content.Contains(""))
-                                               .Then(a => creator.Execute())
+                                               .Then(a => creator.CreateResponse())
                                                .Build();
                                    });
 
@@ -112,20 +112,20 @@ namespace FluentImposter.Core.Tests.Unit.DSL
 
                                        imposter.IsOfType(ImposterType.REST)
                                                .When(r => r.Body.Content.Contains(""))
-                                               .Then(a => creator.Execute())
+                                               .Then(a => creator.CreateResponse())
                                                .Build();
                                    });
 
             var firstImposter = imposterHostBuilder.Imposters.First();
 
-            Expression<Action<ResponseCreator>> expectedAction = a => a.Execute();
+            Expression<Action<IResponseCreator>> expectedAction = a => a.CreateResponse();
 
             firstImposter.Action.Should().BeEquivalentTo(expectedAction);
         }
 
-        public class DefaultResponseCreator: ResponseCreator
+        public class DefaultResponseCreator: IResponseCreator
         {
-            protected override Response CreateResponse()
+            public Response CreateResponse()
             {
                 return new Response();
             }

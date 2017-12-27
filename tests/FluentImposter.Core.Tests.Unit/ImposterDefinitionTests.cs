@@ -12,8 +12,6 @@ namespace FluentImposter.Core.Tests.Unit
 {
     public class ImposterDefinitionTests
     {
-        private readonly Uri _testUri = new Uri("http://localhost:5000");
-
         [Fact]
         public void ImposterDefinition_ImposterOfTypeRestCanBeCreated()
         {

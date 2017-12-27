@@ -15,7 +15,8 @@ namespace FluentImposter.Core.Builders
         }
         public ImposterRuleAction When(Expression<Func<Request, bool>> condition)
         {
-            _imposter.SetCondition(condition);
+            _imposter.CreateRuleCondition(condition);
+
             return new ImposterRuleAction(_imposter);
         }
     }

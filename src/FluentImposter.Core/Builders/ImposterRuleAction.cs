@@ -15,7 +15,7 @@ namespace FluentImposter.Core.Builders
         }
         public IBuilder Then(Expression<Action<IResponseCreator>> actionExecutor)
         {
-            _imposter.SetAction(actionExecutor);
+            _imposter.CreateRuleAction(actionExecutor);
 
             return new Builder(_imposter);
         }

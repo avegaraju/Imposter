@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace FluentImposter.Core.Entities
 {
     public class Imposter
     {
+        private Rule _newRule;
+        private readonly List<Rule> _rules;
+
         public string Name { get; }
         public ImposterType Type { get; private set; }
-        public Expression<Func<Request,bool>> Condition { get; private set; }
-        public Expression<Action<IResponseCreator>> Action { get; private set; }
+        public IEnumerable<Rule> Rules => _rules;
 
         public Imposter(string name)
         {
             Name = name;
+            _rules = new List<Rule>();
         }
 
         internal void SetType(ImposterType type)
@@ -20,14 +24,17 @@ namespace FluentImposter.Core.Entities
             Type = type;
         }
 
-        internal void SetCondition(Expression<Func<Request, bool>> condition)
+        internal void CreateRuleCondition(Expression<Func<Request,bool>> condition)
         {
-            Condition = condition;
+            _newRule = new Rule();
+            _newRule.SetCondition(condition);
+            
+            _rules.Add(_newRule);
         }
-
-        internal void SetAction(Expression<Action<IResponseCreator>> action)
+        
+        internal void CreateRuleAction(Expression<Action<IResponseCreator>> action)
         {
-            Action = action;
+            _newRule.SetAction(action);
         }
     }
 }

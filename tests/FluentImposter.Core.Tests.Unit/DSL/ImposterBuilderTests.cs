@@ -96,7 +96,8 @@ namespace FluentImposter.Core.Tests.Unit.DSL
 
             Expression<Func<Request, bool>> expectedCondition = r => r.Body.Content.Contains("");
 
-            firstImposter.Condition.Should().BeEquivalentTo(expectedCondition);
+            firstImposter.Rules.First().Condition
+                         .Should().BeEquivalentTo(expectedCondition);
         }
 
         [Fact]
@@ -119,7 +120,8 @@ namespace FluentImposter.Core.Tests.Unit.DSL
 
             Expression<Action<IResponseCreator>> expectedAction = a => a.CreateResponse();
 
-            firstImposter.Action.Should().BeEquivalentTo(expectedAction);
+            firstImposter.Rules.First().Action
+                         .Should().BeEquivalentTo(expectedAction);
         }
 
         public class DefaultResponseCreator: IResponseCreator

@@ -6,7 +6,7 @@ using FluentImposter.Core.Builders;
 
 using Xunit;
 
-namespace FluentImposter.Core.Tests.Unit.DSL
+namespace FluentImposter.Core.Tests.Unit.Builders
 {
     /// ////////////////////////////////////////////////////////////////
     //End goal of the DSL

@@ -2,8 +2,8 @@
 
 namespace FluentImposter.Core
 {
-    public interface IImposter: IResponseCreator
+    public interface IImposter
     {
-        Imposter Build(ImposterDefinition imposterDefinirion);
+        Imposter Build(ImposterDefinition imposterDefinition);
     }
 }

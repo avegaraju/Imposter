@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 using FluentImposter.Core.Entities;
 
-namespace FluentImposter.Core.DSL
+namespace FluentImposter.Core.Builders
 {
     public class ImposterRuleAction
     {
@@ -13,7 +13,7 @@ namespace FluentImposter.Core.DSL
         {
             _imposter = imposter;
         }
-        public IBuilder Then(Expression<Action<ResponseCreator>> actionExecutor)
+        public IBuilder Then(Expression<Action<IResponseCreator>> actionExecutor)
         {
             _imposter.SetAction(actionExecutor);
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-using FluentImposter.Core.DSL;
-
 namespace FluentImposter.Core.Entities
 {
     public class Imposter
@@ -10,7 +8,7 @@ namespace FluentImposter.Core.Entities
         public string Name { get; }
         public ImposterType Type { get; private set; }
         public Expression<Func<Request,bool>> Condition { get; private set; }
-        public Expression<Action<ResponseCreator>> Action { get; private set; }
+        public Expression<Action<IResponseCreator>> Action { get; private set; }
 
         public Imposter(string name)
         {
@@ -27,7 +25,7 @@ namespace FluentImposter.Core.Entities
             Condition = condition;
         }
 
-        internal void SetAction(Expression<Action<ResponseCreator>> action)
+        internal void SetAction(Expression<Action<IResponseCreator>> action)
         {
             Action = action;
         }

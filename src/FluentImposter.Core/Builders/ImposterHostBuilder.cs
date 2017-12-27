@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using FluentImposter.Core.Entities;
 
-namespace FluentImposter.Core.DSL
+namespace FluentImposter.Core.Builders
 {
     public class ImposterHostBuilder
     {

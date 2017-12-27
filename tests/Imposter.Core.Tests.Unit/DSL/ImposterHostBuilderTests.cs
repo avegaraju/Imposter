@@ -2,7 +2,7 @@
 
 using FluentAssertions;
 
-using FluentImposter.Core.DSL;
+using FluentImposter.Core.Builders;
 
 using Xunit;
 

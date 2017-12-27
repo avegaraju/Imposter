@@ -1,5 +1,4 @@
-﻿using FluentImposter.Core.DSL;
-using FluentImposter.Core.Entities;
+﻿using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {

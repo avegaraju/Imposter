@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Cache;
 
 using FluentAssertions;
 
-using FluentImposter.Core.DSL;
+using FluentImposter.Core.Builders;
 using FluentImposter.Core.Entities;
 
 using Xunit;

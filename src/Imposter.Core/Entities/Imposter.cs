@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-using FluentImposter.Core.DSL;
-
 namespace FluentImposter.Core.Entities
 {
     public class Imposter

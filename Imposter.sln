@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.Core", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.Core.Tests.Unit", "tests\FluentImposter.Core.Tests.Unit\FluentImposter.Core.Tests.Unit.csproj", "{969962D8-24ED-44E0-AA3F-951A25289D25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.AspnetCore", "src\FluentImposter.AspnetCore\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj", "{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.AspnetCore", "src\FluentImposter.AspnetCore\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj", "{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.AspnetCore.Tests.Integration", "tests\FluentImposter.AspnetCore.Tests.Integration\FluentImposter.AspnetCore.Tests.Integration.csproj", "{A40AE757-DC54-497C-A62B-C8DC1616AA33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,10 @@ Global
 		{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{633044E5-4073-4BCA-A79E-8E8F5E3AF3C4} = {378E295C-FB89-4011-A0DC-C9E3E1E1C7A7}
 		{969962D8-24ED-44E0-AA3F-951A25289D25} = {6C6CAF2F-982F-4755-B756-FD3181B85B89}
 		{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB} = {378E295C-FB89-4011-A0DC-C9E3E1E1C7A7}
+		{A40AE757-DC54-497C-A62B-C8DC1616AA33} = {6C6CAF2F-982F-4755-B756-FD3181B85B89}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F8BF240-FF57-4BA8-8EA9-1C1C4FA5FB94}

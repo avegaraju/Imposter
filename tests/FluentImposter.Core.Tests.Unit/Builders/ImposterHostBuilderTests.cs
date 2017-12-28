@@ -3,6 +3,7 @@
 using FluentAssertions;
 
 using FluentImposter.Core.Builders;
+using FluentImposter.Core.Entities;
 
 using Xunit;
 
@@ -59,7 +60,7 @@ namespace FluentImposter.Core.Tests.Unit.Builders
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("", i => { });
+                    .HasAnImposter("", i => new Imposter(""));
 
             imposterHostBuilder
                     .Should().BeOfType<ImposterHostBuilder>();
@@ -70,7 +71,7 @@ namespace FluentImposter.Core.Tests.Unit.Builders
         {
             var imposterHost = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("", i => { })
+                    .HasAnImposter("", i => new Imposter(""))
                     .Create();
 
             imposterHost

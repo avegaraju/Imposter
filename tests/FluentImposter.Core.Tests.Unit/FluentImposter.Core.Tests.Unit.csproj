@@ -64,8 +64,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\ImposterBuilderTests.cs" />
-    <Compile Include="Builders\ImposterHostBuilderTests.cs" />
     <Compile Include="ImposterDefinitionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

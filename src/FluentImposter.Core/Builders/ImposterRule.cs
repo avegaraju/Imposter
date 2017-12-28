@@ -5,11 +5,11 @@ using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core.Builders
 {
-    public class ImposterRuleBuilder
+    public class ImposterRule
     {
         private readonly Imposter _imposter;
 
-        public ImposterRuleBuilder(Imposter imposter)
+        public ImposterRule(Imposter imposter)
         {
             _imposter = imposter;
         }

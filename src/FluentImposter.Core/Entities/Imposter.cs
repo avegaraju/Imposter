@@ -10,6 +10,7 @@ namespace FluentImposter.Core.Entities
         private readonly List<Rule> _rules;
 
         public string Name { get; }
+        public string Resource { get; private set; }
         public ImposterType Type { get; private set; }
         public IEnumerable<Rule> Rules => _rules;
 
@@ -35,6 +36,11 @@ namespace FluentImposter.Core.Entities
         internal void CreateRuleAction(Expression<Action<IResponseCreator>> action)
         {
             _newRule.SetAction(action);
+        }
+
+        internal void SetResource(string resourcePath)
+        {
+            Resource = resourcePath;
         }
     }
 }

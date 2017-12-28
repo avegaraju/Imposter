@@ -13,11 +13,11 @@ namespace FluentImposter.Core.Builders
         {
             _imposter = imposter;
         }
-        public ImposterRuleBuilder Then(Expression<Action<IResponseCreator>> actionExecutor)
+        public ImposterRule Then(Expression<Action<IResponseCreator>> actionExecutor)
         {
             _imposter.CreateRuleAction(actionExecutor);
 
-            return new ImposterRuleBuilder(_imposter);
+            return new ImposterRule(_imposter);
         }
     }
 }

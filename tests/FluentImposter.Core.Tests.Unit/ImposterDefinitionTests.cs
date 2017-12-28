@@ -18,6 +18,7 @@ namespace FluentImposter.Core.Tests.Unit
             ImposterDefinition imposterDefinition = CreateSut();
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
                                              .Build();
 
             imposter.Type
@@ -25,14 +26,28 @@ namespace FluentImposter.Core.Tests.Unit
         }
 
         [Fact]
+        public void ImposterDefinition_ImposterCanStubAResource()
+        {
+            ImposterDefinition imposterDefinition = CreateSut();
+
+            var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
+                                             .Build();
+
+            imposter.Resource
+                    .Should().Be("/test");
+        }
+
+        [Fact]
         public void HasAnImposter_ImposterConditionsAreCorrectlyAddedToImposter()
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter =  imposterDefinition.IsOfType(ImposterType.REST)
-                                               .When(r => r.Body.Content.Contains(""))
-                                               .Then(a => new DefaultResponseCreator().CreateResponse())
-                                               .Build();
+            var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
+                                             .When(r => r.Body.Content.Contains(""))
+                                             .Then(a => new DefaultResponseCreator().CreateResponse())
+                                             .Build();
 
             Expression<Func<Request, bool>> expectedCondition = r => r.Body.Content.Contains("");
 
@@ -46,6 +61,7 @@ namespace FluentImposter.Core.Tests.Unit
             ImposterDefinition imposterDefinition = CreateSut();
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
                                              .When(r => r.Body.Content.Contains(""))
                                              .Then(a => new DefaultResponseCreator().CreateResponse())
                                              .When(r => r.Body.Content.StartsWith("test"))
@@ -74,6 +90,7 @@ namespace FluentImposter.Core.Tests.Unit
             ImposterDefinition imposterDefinition = CreateSut();
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
                                              .When(r => r.Body.Content.Contains(""))
                                              .Then(a => new DefaultResponseCreator().CreateResponse())
                                              .Build();
@@ -86,7 +103,7 @@ namespace FluentImposter.Core.Tests.Unit
 
         private static ImposterDefinition CreateSut()
         {
-            return new ImposterDefinition(new Imposter("test"));
+            return new ImposterDefinition("test");
         }
 
         private class DefaultResponseCreator : IResponseCreator

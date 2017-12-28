@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 
 using FluentImposter.Core.Builders;
+using FluentImposter.Core.Entities;
 
 using Xunit;
 
@@ -18,7 +19,7 @@ namespace FluentImposter.Core.Tests.Unit.Builders
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter("", i => { });
+                    .HasAnImposter("", i => new Imposter(""));
 
             var imposter = imposterHostBuilder.Imposters.First();
 
@@ -33,7 +34,7 @@ namespace FluentImposter.Core.Tests.Unit.Builders
         {
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter(null, i => { });
+                    .HasAnImposter(null, i => new Imposter(""));
 
             var imposter = imposterHostBuilder.Imposters.First();
 
@@ -50,7 +51,7 @@ namespace FluentImposter.Core.Tests.Unit.Builders
 
             var imposterHostBuilder = new ImposterHostBuilder()
                     .HostedOn(_testUri)
-                    .HasAnImposter(expectedImposterName, i => { });
+                    .HasAnImposter(expectedImposterName, i => new Imposter(""));
 
             var imposter = imposterHostBuilder.Imposters.First();
 

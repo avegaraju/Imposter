@@ -7,7 +7,7 @@ namespace FluentImposter.Core.Builders
     public interface IImposterBuilder
     {
         ImposterHostBuilder HasAnImposter(string name,
-                                          Action<ImposterDefinition> imposterDefinitionAction);
+                                          Func<ImposterDefinition, Imposter> imposterDefinitionFunction);
     }
 
     public class ImposterBuilder: IImposterBuilder
@@ -20,17 +20,17 @@ namespace FluentImposter.Core.Builders
         }
 
         public ImposterHostBuilder HasAnImposter(string name,
-                                                 Action<ImposterDefinition> imposterDefinitionAction)
+                                                 Func<ImposterDefinition,Imposter> imposterDefinitionFunction)
         {
-            var imposter = string.IsNullOrEmpty(name)
-                               ? new Imposter(Guid.NewGuid().ToString())
-                               : new Imposter(name);
+            var imposterName = string.IsNullOrEmpty(name)
+                                   ? Guid.NewGuid().ToString()
+                                   : name;
 
-            var imposterDefinition = new ImposterDefinition(imposter);
-            imposterDefinitionAction(imposterDefinition);
+            var imposterDefinition = new ImposterDefinition(imposterName);
+            var imposter = imposterDefinitionFunction(imposterDefinition);
 
             _imposterHostBuilder.AddImposter(imposter);
-            
+
             return _imposterHostBuilder;
         }
     }

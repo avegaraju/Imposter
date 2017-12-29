@@ -95,7 +95,7 @@ namespace FluentImposter.Core.Tests.Unit
                                              .Then(new DefaultResponseCreator().CreateResponse())
                                              .Build();
 
-            Expression<Action<IResponseCreator>> expectedAction = a => a.CreateResponse();
+            var expectedAction = new DefaultResponseCreator().CreateResponse();
 
             imposter.Rules.First().Action
                     .Should().BeEquivalentTo(expectedAction);

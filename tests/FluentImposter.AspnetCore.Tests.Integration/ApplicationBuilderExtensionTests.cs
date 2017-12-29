@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 
 using FluentAssertions;
@@ -19,11 +20,8 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         private Action<IApplicationBuilder> _applicationBuilder;
 
         [Fact]
-        public async void Middleware_RouteHandler_InvokesHandlerAsPerResource()
+        public async void Middleware_ImposterReceivedRequest_ReturnsExpectedResponse()
         {
-            var webHostBuilder = new WebHostBuilder()
-                    .Configure(_applicationBuilder);
-
             _applicationBuilder = app =>
                                   {
                                       app.UseImposters(new Uri("http://localhost:8080"),
@@ -33,11 +31,14 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                                        });
                                   };
 
+            var webHostBuilder = new WebHostBuilder()
+                    .Configure(_applicationBuilder);
+
 
             using (var testServer = new TestServer(webHostBuilder))
             {
                 var response = await testServer
-                                       .CreateRequest("/")
+                                       .CreateRequest("/test")
                                        .And(message =>
                                             {
                                                 message.Content =
@@ -45,8 +46,9 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                             })
                                        .PostAsync();
 
-                response.Content.ToString()
-                        .Should().Contain("yoyo");
+                var content = response.Content.ReadAsStringAsync().Result;
+
+                content.Should().Be("yoyo");
             }
         }
     }

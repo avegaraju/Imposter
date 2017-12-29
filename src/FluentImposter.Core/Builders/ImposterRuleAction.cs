@@ -13,9 +13,9 @@ namespace FluentImposter.Core.Builders
         {
             _imposter = imposter;
         }
-        public ImposterRule Then(Expression<Action<IResponseCreator>> actionExecutor)
+        public ImposterRule Then(Response response)
         {
-            _imposter.CreateRuleAction(actionExecutor);
+            _imposter.CreateRuleAction(response);
 
             return new ImposterRule(_imposter);
         }

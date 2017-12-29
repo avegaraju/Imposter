@@ -33,7 +33,7 @@ namespace FluentImposter.Core.Entities
             _rules.Add(_newRule);
         }
         
-        internal void CreateRuleAction(Expression<Action<IResponseCreator>> action)
+        internal void CreateRuleAction(Response action)
         {
             _newRule.SetAction(action);
         }

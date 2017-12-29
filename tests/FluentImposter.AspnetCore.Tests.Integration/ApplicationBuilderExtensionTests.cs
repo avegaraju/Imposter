@@ -59,7 +59,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                     .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.Body.Content.Contains("yo"))
-                    .Then(a => new DummyResponseCreator().CreateResponse())
+                    .Then(new DummyResponseCreator().CreateResponse())
                     .Build();
         }
     }

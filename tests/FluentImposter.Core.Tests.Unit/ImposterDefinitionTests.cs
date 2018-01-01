@@ -45,11 +45,11 @@ namespace FluentImposter.Core.Tests.Unit
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
                                              .StubsResource("/test")
-                                             .When(r => r.Body.Content.Contains(""))
+                                             .When(r => r.Content.Contains(""))
                                              .Then(new DefaultResponseCreator().CreateResponse())
                                              .Build();
 
-            Expression<Func<Request, bool>> expectedCondition = r => r.Body.Content.Contains("");
+            Expression<Func<Request, bool>> expectedCondition = r => r.Content.Contains("");
 
             imposter.Rules.First().Condition
                     .Should().BeEquivalentTo(expectedCondition);
@@ -62,18 +62,18 @@ namespace FluentImposter.Core.Tests.Unit
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
                                              .StubsResource("/test")
-                                             .When(r => r.Body.Content.Contains(""))
+                                             .When(r => r.Content.Contains(""))
                                              .Then(new DefaultResponseCreator().CreateResponse())
-                                             .When(r => r.Body.Content.StartsWith("test"))
+                                             .When(r => r.Content.StartsWith("test"))
                                              .Then(new TestResponseCreator().CreateResponse())
                                              .Build();
 
             var firstRule = new Rule();
-            firstRule.SetCondition(r => r.Body.Content.Contains(""));
+            firstRule.SetCondition(r => r.Content.Contains(""));
             firstRule.SetAction(new DefaultResponseCreator().CreateResponse());
 
             var secondRule = new Rule();
-            secondRule.SetCondition(r => r.Body.Content.StartsWith("test"));
+            secondRule.SetCondition(r => r.Content.StartsWith("test"));
             secondRule.SetAction(new TestResponseCreator().CreateResponse());
 
             imposter.Rules
@@ -91,7 +91,7 @@ namespace FluentImposter.Core.Tests.Unit
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
                                              .StubsResource("/test")
-                                             .When(r => r.Body.Content.Contains(""))
+                                             .When(r => r.Content.Contains(""))
                                              .Then(new DefaultResponseCreator().CreateResponse())
                                              .Build();
 

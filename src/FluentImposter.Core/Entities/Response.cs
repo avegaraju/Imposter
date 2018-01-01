@@ -2,6 +2,6 @@
 {
     public class Response
     {
-        public Body Body { get; set; }
+        public string Content { get; set; }
     }
 }

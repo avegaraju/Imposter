@@ -53,7 +53,7 @@ namespace FluentImposter.AspnetCore
 
                 if (ConditionMatches(content, condition))
                 {
-                    await context.Response.WriteAsync(imposterRule.Action.Body.Content);
+                    await context.Response.WriteAsync(imposterRule.Action.Content);
                 }
             }
         }
@@ -67,10 +67,7 @@ namespace FluentImposter.AspnetCore
         {
             return new Request()
             {
-                Body = new Body()
-                {
-                    Content = content
-                }
+                Content = content
             };
         }
     }

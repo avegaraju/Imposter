@@ -52,7 +52,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
             return new ImposterDefinition("test")
                     .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
-                    .When(r => r.Body.Content.Contains("dummy"))
+                    .When(r => r.Content.Contains("dummy"))
                     .Then(new DummyResponseCreator().CreateResponse())
                     .Build();
         }
@@ -64,10 +64,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         {
             return new Response()
                    {
-                       Body = new Body()
-                              {
-                                  Content = "dummy response"
-                              }
+                       Content = "dummy response"
                    };
         }
     }

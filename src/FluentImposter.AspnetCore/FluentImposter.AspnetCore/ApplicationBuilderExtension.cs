@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
+using FluentImposter.Core;
 using FluentImposter.Core.Entities;
 
 using Microsoft.AspNetCore.Builder;
@@ -47,15 +48,18 @@ namespace FluentImposter.AspnetCore
 
         private static async Task EvaluateRules(Imposter imposter, HttpContext context, string content)
         {
-            foreach (var imposterRule in imposter.Rules)
-            {
-                var condition = imposterRule.Condition.Compile();
+            var response = RulesEvaluator.Evaluate(imposter, context.Request.Body);
 
-                if (ConditionMatches(content, condition))
-                {
-                    await context.Response.WriteAsync(imposterRule.Action.Content);
-                }
-            }
+            await context.Response.WriteAsync(response.Content);
+            //foreach (var imposterRule in imposter.Rules)
+            //{
+            //    var condition = imposterRule.Condition.Compile();
+
+            //    if (ConditionMatches(content, condition))
+            //    {
+            //        await context.Response.WriteAsync(imposterRule.Action.Content);
+            //    }
+            //}
         }
 
         private static bool ConditionMatches(string content, Func<Request, bool> condition)

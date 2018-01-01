@@ -14,7 +14,7 @@ namespace FluentImposter.Core.Entities
         public ImposterType Type { get; private set; }
         public IEnumerable<Rule> Rules => _rules;
 
-        public Imposter(string name)
+        internal Imposter(string name)
         {
             Name = name;
             _rules = new List<Rule>();

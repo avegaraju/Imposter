@@ -14,6 +14,7 @@ namespace FluentImposter.Core.Tests.Unit
         [Fact]
         public async void Evaluate_WhenRequestStreamDoesNotMatchCondition_ReturnsAppropriateResponseContent()
         {
+            string responseContent = "if match found, this text will be returned.";
             using (var stream = await GetRequestContentStreamAsync("dummy request content"))
             {
                 var imposter = new ImposterDefinition("test")
@@ -21,10 +22,7 @@ namespace FluentImposter.Core.Tests.Unit
                         .StubsResource("/test")
                         .When(r => r.Content.Contains("none of the imposter conditions will be able to "
                                                       + "match this text"))
-                        .Then(new Response()
-                              {
-                                  Content = "if match found, this text will be returned."
-                              })
+                        .Then(new DummyResponseCreator(responseContent))
                         .Build();
 
                 var response = RulesEvaluator.Evaluate(imposter, stream);
@@ -36,6 +34,7 @@ namespace FluentImposter.Core.Tests.Unit
         [Fact]
         public async void Evaluate_WhenRequestStreamDoesNotMatchCondition_ReturnsInternalServerError()
         {
+            string responseContent = "if match found, this text will be returned.";
             using (var stream = await GetRequestContentStreamAsync("dummy request content"))
             {
                 var imposter = new ImposterDefinition("test")
@@ -43,10 +42,7 @@ namespace FluentImposter.Core.Tests.Unit
                         .StubsResource("/test")
                         .When(r => r.Content.Contains("none of the imposter conditions will be able to "
                                                       + "match this text"))
-                        .Then(new Response()
-                              {
-                                  Content = "if match found, this text will be returned."
-                              })
+                        .Then(new DummyResponseCreator(responseContent))
                         .Build();
 
                 var response = RulesEvaluator.Evaluate(imposter, stream);
@@ -67,10 +63,7 @@ namespace FluentImposter.Core.Tests.Unit
                         .IsOfType(ImposterType.REST)
                         .StubsResource("/test")
                         .When(r => r.Content.Contains(requestContent))
-                        .Then(new Response()
-                              {
-                                  Content = "dummy response"
-                              })
+                        .Then(new DummyResponseCreator(responseContent))
                         .Build();
 
                 var response = RulesEvaluator.Evaluate(imposter, stream);
@@ -89,6 +82,24 @@ namespace FluentImposter.Core.Tests.Unit
             stream.Position = 0;
 
             return stream;
+        }
+    }
+
+    internal class DummyResponseCreator: IResponseCreator
+    {
+        private readonly string _content;
+
+        public DummyResponseCreator(string content)
+        {
+            _content = content;
+        }
+        public Response CreateResponse()
+        {
+            return new Response()
+                   {
+                       Content = _content,
+                       StatusCode = 200
+                   };
         }
     }
 }

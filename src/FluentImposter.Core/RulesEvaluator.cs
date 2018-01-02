@@ -26,7 +26,7 @@ namespace FluentImposter.Core
 
                 if (ConditionMatches(content, condition))
                 {
-                    return imposterRule.Action;
+                    return imposterRule.ResponseCreatorAction.CreateResponse();
                 }
             }
 

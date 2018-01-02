@@ -4,8 +4,7 @@ namespace FluentImposter.Core.Entities
 {
     public enum ImposterType
     {
-        REST,
-        SOAP
+        REST
     }
     public class ImposterDefinition
     {

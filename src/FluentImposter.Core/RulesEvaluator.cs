@@ -9,6 +9,8 @@ namespace FluentImposter.Core
     {
         public static Response Evaluate(Imposter imposter, Stream requestStream)
         {
+            requestStream.Position = 0;
+
             using (var streamReader = new StreamReader(requestStream))
             {
                 var content = streamReader.ReadToEnd();

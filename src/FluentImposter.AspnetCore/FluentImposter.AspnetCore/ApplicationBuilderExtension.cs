@@ -51,28 +51,6 @@ namespace FluentImposter.AspnetCore
             var response = RulesEvaluator.Evaluate(imposter, context.Request.Body);
 
             await context.Response.WriteAsync(response.Content);
-            //foreach (var imposterRule in imposter.Rules)
-            //{
-            //    var condition = imposterRule.Condition.Compile();
-
-            //    if (ConditionMatches(content, condition))
-            //    {
-            //        await context.Response.WriteAsync(imposterRule.Action.Content);
-            //    }
-            //}
-        }
-
-        private static bool ConditionMatches(string content, Func<Request, bool> condition)
-        {
-            return condition(BuildRequestUsing(content));
-        }
-
-        private static Request BuildRequestUsing(string content)
-        {
-            return new Request()
-            {
-                Content = content
-            };
         }
     }
 }

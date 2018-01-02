@@ -1,8 +1,10 @@
-﻿namespace FluentImposter.Core.Entities
+﻿using System.Net.Http;
+
+namespace FluentImposter.Core.Entities
 {
     public class Request
     {
-        public Body Body { get; set; }
+        public string Content { get; set; }
     }
 }
 

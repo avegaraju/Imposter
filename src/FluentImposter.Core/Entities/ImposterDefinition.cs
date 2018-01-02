@@ -4,22 +4,21 @@ namespace FluentImposter.Core.Entities
 {
     public enum ImposterType
     {
-        REST,
-        SOAP
+        REST
     }
     public class ImposterDefinition
     {
         private readonly Imposter _imposter;
 
-        public ImposterDefinition(Imposter imposter)
+        public ImposterDefinition(string imposterName)
         {
-            _imposter = imposter;
+            _imposter = new Imposter(imposterName);
         }
-        public ImposterRuleBuilder IsOfType(ImposterType type)
+        public ImposterStub IsOfType(ImposterType type)
         {
             _imposter.SetType(type);
 
-            return new ImposterRuleBuilder(_imposter);
+            return new ImposterStub(_imposter);
         }
     }
 }

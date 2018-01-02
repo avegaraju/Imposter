@@ -18,6 +18,7 @@ namespace FluentImposter.Core.Tests.Unit
             ImposterDefinition imposterDefinition = CreateSut();
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
                                              .Build();
 
             imposter.Type
@@ -25,16 +26,30 @@ namespace FluentImposter.Core.Tests.Unit
         }
 
         [Fact]
+        public void ImposterDefinition_ImposterCanStubAResource()
+        {
+            ImposterDefinition imposterDefinition = CreateSut();
+
+            var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
+                                             .Build();
+
+            imposter.Resource
+                    .Should().Be("/test");
+        }
+
+        [Fact]
         public void HasAnImposter_ImposterConditionsAreCorrectlyAddedToImposter()
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter =  imposterDefinition.IsOfType(ImposterType.REST)
-                                               .When(r => r.Body.Content.Contains(""))
-                                               .Then(a => new DefaultResponseCreator().CreateResponse())
-                                               .Build();
+            var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
+                                             .When(r => r.Content.Contains(""))
+                                             .Then(new DefaultResponseCreator().CreateResponse())
+                                             .Build();
 
-            Expression<Func<Request, bool>> expectedCondition = r => r.Body.Content.Contains("");
+            Expression<Func<Request, bool>> expectedCondition = r => r.Content.Contains("");
 
             imposter.Rules.First().Condition
                     .Should().BeEquivalentTo(expectedCondition);
@@ -46,19 +61,20 @@ namespace FluentImposter.Core.Tests.Unit
             ImposterDefinition imposterDefinition = CreateSut();
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
-                                             .When(r => r.Body.Content.Contains(""))
-                                             .Then(a => new DefaultResponseCreator().CreateResponse())
-                                             .When(r => r.Body.Content.StartsWith("test"))
-                                             .Then(a => new TestResponseCreator().CreateResponse())
+                                             .StubsResource("/test")
+                                             .When(r => r.Content.Contains(""))
+                                             .Then(new DefaultResponseCreator().CreateResponse())
+                                             .When(r => r.Content.StartsWith("test"))
+                                             .Then(new TestResponseCreator().CreateResponse())
                                              .Build();
 
             var firstRule = new Rule();
-            firstRule.SetCondition(r => r.Body.Content.Contains(""));
-            firstRule.SetAction(a => new DefaultResponseCreator().CreateResponse());
+            firstRule.SetCondition(r => r.Content.Contains(""));
+            firstRule.SetAction(new DefaultResponseCreator().CreateResponse());
 
             var secondRule = new Rule();
-            secondRule.SetCondition(r => r.Body.Content.StartsWith("test"));
-            secondRule.SetAction(a => new TestResponseCreator().CreateResponse());
+            secondRule.SetCondition(r => r.Content.StartsWith("test"));
+            secondRule.SetAction(new TestResponseCreator().CreateResponse());
 
             imposter.Rules
                     .Should().BeEquivalentTo(new[]
@@ -74,11 +90,12 @@ namespace FluentImposter.Core.Tests.Unit
             ImposterDefinition imposterDefinition = CreateSut();
 
             var imposter = imposterDefinition.IsOfType(ImposterType.REST)
-                                             .When(r => r.Body.Content.Contains(""))
-                                             .Then(a => new DefaultResponseCreator().CreateResponse())
+                                             .StubsResource("/test")
+                                             .When(r => r.Content.Contains(""))
+                                             .Then(new DefaultResponseCreator().CreateResponse())
                                              .Build();
 
-            Expression<Action<IResponseCreator>> expectedAction = a => a.CreateResponse();
+            var expectedAction = new DefaultResponseCreator().CreateResponse();
 
             imposter.Rules.First().Action
                     .Should().BeEquivalentTo(expectedAction);
@@ -86,7 +103,7 @@ namespace FluentImposter.Core.Tests.Unit
 
         private static ImposterDefinition CreateSut()
         {
-            return new ImposterDefinition(new Imposter("test"));
+            return new ImposterDefinition("test");
         }
 
         private class DefaultResponseCreator : IResponseCreator

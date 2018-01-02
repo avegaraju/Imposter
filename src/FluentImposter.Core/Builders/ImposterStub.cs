@@ -2,17 +2,18 @@
 
 namespace FluentImposter.Core.Builders
 {
-    public class ImposterRuleAction
+    public class ImposterStub
     {
         private readonly Imposter _imposter;
 
-        public ImposterRuleAction(Imposter imposter)
+        public ImposterStub(Imposter imposter)
         {
             _imposter = imposter;
         }
-        public ImposterRule Then(Response response)
+
+        public ImposterRule StubsResource(string resourcePath)
         {
-            _imposter.CreateRuleAction(response);
+            _imposter.SetResource(resourcePath);
 
             return new ImposterRule(_imposter);
         }

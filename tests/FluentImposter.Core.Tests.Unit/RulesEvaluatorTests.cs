@@ -1,9 +1,11 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
 
 using FluentAssertions;
 
 using FluentImposter.Core.Entities;
+
+using Microsoft.Extensions.Primitives;
 
 using Xunit;
 
@@ -11,95 +13,89 @@ namespace FluentImposter.Core.Tests.Unit
 {
     public class RulesEvaluatorTests
     {
+        private const int INTERNAL_SERVER_ERROR_CODE = 500;
+
         [Fact]
-        public async void Evaluate_WhenRequestStreamDoesNotMatchCondition_ReturnsAppropriateResponseContent()
+        public void Ctor_WithNullEvaluators_ReturnsArgumentNullException()
         {
+            Action exceptionThrowingAction = () => new RulesEvaluator(null);
+
+            exceptionThrowingAction.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Ctor_WhenOneOfTheEvaluatorsIsNull_ReturnsArgumentNullException()
+        {
+            Action exceptionThrowingAction = () => new RulesEvaluator(new IEvaluator[]{null,new DummyEvaluator()});
+
+            exceptionThrowingAction.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Evaluate_WhenAnEvaluatorReturnsNullResponse_ReturnsInternalServerErrorResponse()
+        {
+            var rulesEvaluator = new RulesEvaluator(new IEvaluator[]
+                                                    {
+                                                        new DummyEvaluator(),
+                                                        new NullResponseReturningEvaluator()
+                                                    });
+
             string responseContent = "if match found, this text will be returned.";
-            using (var stream = await GetRequestContentStreamAsync("dummy request content"))
-            {
-                var imposter = new ImposterDefinition("test")
-                        .IsOfType(ImposterType.REST)
-                        .StubsResource("/test")
-                        .When(r => r.Content.Contains("none of the imposter conditions will be able to "
-                                                      + "match this text"))
-                        .Then(new DummyResponseCreator(responseContent))
-                        .Build();
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.RequestHeader.Contains("Accept"))
+                    .Then(new DummyResponseCreator(responseContent))
+                    .Build();
 
-                var response = RulesEvaluator.Evaluate(imposter, stream);
+            List<KeyValuePair<string, StringValues>> keyValuePairs
+                    = new List<KeyValuePair<string, StringValues>>
+                      {
+                          new KeyValuePair<string, StringValues>("Accept",
+                                                                 new StringValues(new[]
+                                                                                  {
+                                                                                      "text/plain",
+                                                                                      "text/xml"
+                                                                                  }))
+                      };
 
-                response.Content.Should().Be("None of the imposter conditions matched.");
-            }
+            var request = BuildRequestWithHeaders(keyValuePairs);
+
+            var response = rulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR_CODE);
         }
 
-        [Fact]
-        public async void Evaluate_WhenRequestStreamDoesNotMatchCondition_ReturnsInternalServerError()
+        private Request BuildRequestWithHeaders(List<KeyValuePair<string, StringValues>> keyValuePairs)
         {
-            string responseContent = "if match found, this text will be returned.";
-            using (var stream = await GetRequestContentStreamAsync("dummy request content"))
+            var requestHeader = new RequestHeader();
+
+            foreach (KeyValuePair<string, StringValues> keyValuePair in keyValuePairs)
             {
-                var imposter = new ImposterDefinition("test")
-                        .IsOfType(ImposterType.REST)
-                        .StubsResource("/test")
-                        .When(r => r.Content.Contains("none of the imposter conditions will be able to "
-                                                      + "match this text"))
-                        .Then(new DummyResponseCreator(responseContent))
-                        .Build();
-
-                var response = RulesEvaluator.Evaluate(imposter, stream);
-
-                response.StatusCode.Should().Be(500);
+                requestHeader.Add(keyValuePair.Key, keyValuePair.Value.ToArray());
             }
-        }
 
-        [Fact]
-        public async void Evaluate_WhenRequestStreamtMatchesACondition_ReturnsAppropriateResponseContent()
-        {
-            string requestContent = "This content will match one of the imposters";
-            string responseContent = "dummy response";
-
-            using (var stream = await GetRequestContentStreamAsync(requestContent))
-            {
-                var imposter = new ImposterDefinition("test")
-                        .IsOfType(ImposterType.REST)
-                        .StubsResource("/test")
-                        .When(r => r.Content.Contains(requestContent))
-                        .Then(new DummyResponseCreator(responseContent))
-                        .Build();
-
-                var response = RulesEvaluator.Evaluate(imposter, stream);
-
-                response.Content.Should().Be(responseContent);
-            }
-        }
-
-        private static async Task<MemoryStream> GetRequestContentStreamAsync(string content)
-        {
-            var stream = new MemoryStream();
-            var streamWriter = new StreamWriter(stream);
-
-            await streamWriter.WriteAsync(content);
-            streamWriter.Flush();
-            stream.Position = 0;
-
-            return stream;
+            return new Request()
+                   {
+                       RequestHeader = requestHeader
+                   };
         }
     }
 
-    internal class DummyResponseCreator: IResponseCreator
+    internal class DummyEvaluator: IEvaluator
     {
-        private readonly string _content;
-
-        public DummyResponseCreator(string content)
+        public EvaluationResult Evaluate(Imposter imposter, Request request)
         {
-            _content = content;
+            return new EvaluationResult(RuleEvaluationOutcome.FoundAMatch,
+                                        new Response());
         }
-        public Response CreateResponse()
+    }
+
+    internal class NullResponseReturningEvaluator: IEvaluator
+    {
+        EvaluationResult IEvaluator.Evaluate(Imposter imposter, Request request)
         {
-            return new Response()
-                   {
-                       Content = _content,
-                       StatusCode = 200
-                   };
+            return new EvaluationResult(RuleEvaluationOutcome.NoMatchesFound, null);
         }
     }
 }

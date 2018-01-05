@@ -109,8 +109,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HeaderEvaluatorTests.cs" />
     <Compile Include="ImposterDefinitionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestHeaderTests.cs" />
+    <Compile Include="BodyEvaluatorTests.cs" />
     <Compile Include="RulesEvaluatorTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,33 +1,31 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 
 using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {
-    internal static class RulesEvaluator
+    internal class RulesEvaluator
     {
-        public static Response Evaluate(Imposter imposter, Stream requestStream)
-        {
-            requestStream.Position = 0;
+        private const int INTERNAL_SERVER_ERROR = 500;
+        private readonly IEvaluator[] _evaluators;
 
-            using (var streamReader = new StreamReader(requestStream))
-            {
-                var content = streamReader.ReadToEnd();
-                return EvaluateRules(imposter, content);
-            }
+        public RulesEvaluator(IEvaluator[] evaluators)
+        {
+            _evaluators = evaluators ?? throw new ArgumentNullException(nameof(evaluators));
+
+            if(evaluators.Contains(null))
+                throw new ArgumentNullException("One of the evaluators is null.");
         }
 
-        private static Response EvaluateRules(Imposter imposter, string content)
+        public Response Evaluate(Imposter imposter, Request request)
         {
-            foreach (var imposterRule in imposter.Rules)
+            foreach (var evaluator in _evaluators)
             {
-                var condition = imposterRule.Condition.Compile();
+                var evaluationResult = evaluator.Evaluate(imposter, request);
 
-                if (ConditionMatches(content, condition))
-                {
-                    return imposterRule.ResponseCreatorAction.CreateResponse();
-                }
+                if (evaluationResult.Outcome == RuleEvaluationOutcome.FoundAMatch)
+                    return evaluationResult.Response;
             }
 
             return CreateInternalServerErrorResponse();
@@ -37,21 +35,8 @@ namespace FluentImposter.Core
         {
             return new Response()
                    {
-                       Content = "None of the imposter conditions matched.",
+                       Content = "None of evaluators could create a response.",
                        StatusCode = 500
-                   };
-        }
-
-        private static bool ConditionMatches(string content, Func<Request, bool> condition)
-        {
-            return condition(BuildRequestUsing(content));
-        }
-
-        private static Request BuildRequestUsing(string content)
-        {
-            return new Request()
-                   {
-                       Content = content
                    };
         }
     }

@@ -85,6 +85,23 @@ namespace FluentImposter.Core.Tests.Unit
         }
 
         [Fact]
+        public void ImposterDefinition_WhenConditionDefinedOnRequestHeader_ConditionGetsAddedToImposter()
+        {
+            ImposterDefinition imposterDefinition = CreateSut();
+
+            var imposter = imposterDefinition.IsOfType(ImposterType.REST)
+                                             .StubsResource("/test")
+                                             .When(r => r.RequestHeader.Contains("Accept"))
+                                             .Then(new DefaultResponseCreator())
+                                             .Build();
+
+            Expression<Func<Request, bool>> requestCondition = r => r.RequestHeader.Contains("Accept");
+
+            imposter.Rules.First().Condition
+                    .Should().BeEquivalentTo(requestCondition);
+        }
+
+        [Fact]
         public void ImposterDefinition_ImposterResponseIsCorrectlyAddedToImposter()
         {
             ImposterDefinition imposterDefinition = CreateSut();

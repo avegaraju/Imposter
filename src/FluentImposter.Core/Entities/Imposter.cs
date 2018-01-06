@@ -32,10 +32,10 @@ namespace FluentImposter.Core.Entities
             
             _rules.Add(_newRule);
         }
-        
-        internal void CreateRuleAction(Response action)
+
+        internal void CreateRuleAction(IResponseCreator responseCreator)
         {
-            _newRule.SetAction(action);
+            _newRule.SetAction(responseCreator);
         }
 
         internal void SetResource(string resourcePath)

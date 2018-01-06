@@ -26,12 +26,12 @@ namespace FluentImposter.AspnetCore.Tests.Integration
             return _testServer;
         }
 
-        public TestServerBuilder UsingImpostersMiddleware()
+        public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
         {
             Action<IApplicationBuilder> action = app => app.UseImposters(new Uri("http://localhost:8080"),
-                                             new Imposter[]
+                                             new[]
                                              {
-                                                 new DummyImposter().Build(),
+                                                 imposter,
                                              });
 
             _webHostBuilder.Configure(action);
@@ -45,26 +45,14 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         }
     }
 
-    internal class DummyImposter : IImposter
-    {
-        public Imposter Build()
-        {
-            return new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
-                    .StubsResource("/test")
-                    .When(r => r.Content.Contains("dummy"))
-                    .Then(new DummyResponseCreator().CreateResponse())
-                    .Build();
-        }
-    }
-
     internal class DummyResponseCreator : IResponseCreator
     {
         public Response CreateResponse()
         {
             return new Response()
                    {
-                       Content = "dummy response"
+                       Content = "dummy response",
+                       StatusCode = 200
                    };
         }
     }

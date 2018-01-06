@@ -1,32 +1,18 @@
-﻿using System;
-using System.IO;
-
-using FluentImposter.Core.Entities;
+﻿using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {
     internal static class RulesEvaluator
     {
-        public static Response Evaluate(Imposter imposter, Stream requestStream)
-        {
-            requestStream.Position = 0;
-
-            using (var streamReader = new StreamReader(requestStream))
-            {
-                var content = streamReader.ReadToEnd();
-                return EvaluateRules(imposter, content);
-            }
-        }
-
-        private static Response EvaluateRules(Imposter imposter, string content)
+        public static Response Evaluate(Imposter imposter, Request request)
         {
             foreach (var imposterRule in imposter.Rules)
             {
                 var condition = imposterRule.Condition.Compile();
 
-                if (ConditionMatches(content, condition))
+                if (condition(request))
                 {
-                    return imposterRule.Action;
+                    return imposterRule.ResponseCreatorAction.CreateResponse();
                 }
             }
 
@@ -37,21 +23,8 @@ namespace FluentImposter.Core
         {
             return new Response()
                    {
-                       Content = "None of the imposter conditions matched.",
+                       Content = "None of evaluators could create a response.",
                        StatusCode = 500
-                   };
-        }
-
-        private static bool ConditionMatches(string content, Func<Request, bool> condition)
-        {
-            return condition(BuildRequestUsing(content));
-        }
-
-        private static Request BuildRequestUsing(string content)
-        {
-            return new Request()
-                   {
-                       Content = content
                    };
         }
     }

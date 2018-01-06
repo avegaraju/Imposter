@@ -2,7 +2,9 @@
 {
     public class Response
     {
-        public string Content { get; set; }
-        public int StatusCode { get; set; }
+        private const int DEFAULT_STATUS_CODE_OK = 200;
+
+        public string Content { get; set; } = string.Empty;
+        public int StatusCode { get; set; } = DEFAULT_STATUS_CODE_OK;
     }
 }

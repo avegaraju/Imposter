@@ -111,6 +111,8 @@
   <ItemGroup>
     <Compile Include="ImposterDefinitionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RequestBuilder.cs" />
+    <Compile Include="RequestHeaderTests.cs" />
     <Compile Include="RulesEvaluatorTests.cs" />
   </ItemGroup>
   <ItemGroup>

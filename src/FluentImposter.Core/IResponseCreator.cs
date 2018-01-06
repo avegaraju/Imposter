@@ -1,4 +1,6 @@
-﻿using FluentImposter.Core.Entities;
+﻿using System;
+
+using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {

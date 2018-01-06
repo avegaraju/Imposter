@@ -5,16 +5,16 @@ namespace FluentImposter.Core.Builders
     public class ResponseStatusCode
     {
         private readonly Response _response;
-        private readonly ResponseDefinition _responseDefinition;
+        private readonly ResponseBuilder _responseDefinition;
 
         public ResponseStatusCode(Response response,
-                                  ResponseDefinition responseDefinition)
+                                  ResponseBuilder responseDefinition)
         {
             _response = response;
             _responseDefinition = responseDefinition;
         }
 
-        public ResponseDefinition WithResponseStatusCode(int statusCode)
+        public ResponseBuilder WithStatusCode(int statusCode)
         {
             _response.StatusCode = statusCode;
 

@@ -2,11 +2,11 @@
 
 namespace FluentImposter.Core.Entities
 {
-    public class ResponseDefinition
+    public class ResponseBuilder
     {
         private readonly Response _response;
 
-        public ResponseDefinition()
+        public ResponseBuilder()
         {
             _response = new Response();
         }

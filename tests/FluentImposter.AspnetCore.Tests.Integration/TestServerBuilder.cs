@@ -49,11 +49,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
     {
         public Response CreateResponse()
         {
-            return new Response()
-                   {
-                       Content = "dummy response",
-                       StatusCode = 200
-                   };
+            return new ResponseBuilder()
+                    .WithContent("dummy response")
+                    .WithStatusCode(200)
+                    .Build();
         }
     }
 }

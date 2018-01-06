@@ -45,15 +45,14 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         }
     }
 
-   
-
     internal class DummyResponseCreator : IResponseCreator
     {
         public Response CreateResponse()
         {
             return new Response()
                    {
-                       Content = "dummy response"
+                       Content = "dummy response",
+                       StatusCode = 200
                    };
         }
     }

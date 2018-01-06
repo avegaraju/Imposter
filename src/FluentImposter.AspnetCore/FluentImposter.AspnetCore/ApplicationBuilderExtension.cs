@@ -50,18 +50,19 @@ namespace FluentImposter.AspnetCore
 
         private static async Task EvaluateRules(Imposter imposter, HttpContext context, string content)
         {
-            var evaluators = GetEvaluators();
             var request = BuildRequest(context);
 
-            var rulesEvaluator = new RulesEvaluator(evaluators);
-            var response = rulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request);
 
             await context.Response.WriteAsync(response.Content);
         }
 
         private static Request BuildRequest(HttpContext context)
         {
-            using (var streamReader = new StreamReader(context.Request.Body))
+            var stream = context.Request.Body;
+            stream.Position = 0;
+
+            using (var streamReader = new StreamReader(stream))
             {
                 return new Request()
                        {
@@ -81,15 +82,6 @@ namespace FluentImposter.AspnetCore
 
                 return requestHeader;
             }
-        }
-
-        private static IEvaluator[] GetEvaluators()
-        {
-            return new IEvaluator[]
-                   {
-                       new BodyEvaluator(),
-                       new HeaderEvaluator()
-                   };
         }
     }
 }

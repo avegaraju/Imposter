@@ -1,31 +1,19 @@
-﻿using System;
-using System.Linq;
-
-using FluentImposter.Core.Entities;
+﻿using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {
-    internal class RulesEvaluator
+    internal static class RulesEvaluator
     {
-        private const int INTERNAL_SERVER_ERROR = 500;
-        private readonly IEvaluator[] _evaluators;
-
-        public RulesEvaluator(IEvaluator[] evaluators)
+        public static Response Evaluate(Imposter imposter, Request request)
         {
-            _evaluators = evaluators ?? throw new ArgumentNullException(nameof(evaluators));
-
-            if(evaluators.Contains(null))
-                throw new ArgumentNullException("One of the evaluators is null.");
-        }
-
-        public Response Evaluate(Imposter imposter, Request request)
-        {
-            foreach (var evaluator in _evaluators)
+            foreach (var imposterRule in imposter.Rules)
             {
-                var evaluationResult = evaluator.Evaluate(imposter, request);
+                var condition = imposterRule.Condition.Compile();
 
-                if (evaluationResult.Outcome == RuleEvaluationOutcome.FoundAMatch)
-                    return evaluationResult.Response;
+                if (condition(request))
+                {
+                    return imposterRule.ResponseCreatorAction.CreateResponse();
+                }
             }
 
             return CreateInternalServerErrorResponse();

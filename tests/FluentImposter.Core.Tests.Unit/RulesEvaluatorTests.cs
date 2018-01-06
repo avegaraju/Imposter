@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 using FluentAssertions;
 
 using FluentImposter.Core.Entities;
-
-using Microsoft.Extensions.Primitives;
 
 using Xunit;
 
@@ -13,89 +9,272 @@ namespace FluentImposter.Core.Tests.Unit
 {
     public class RulesEvaluatorTests
     {
-        private const int INTERNAL_SERVER_ERROR_CODE = 500;
+        private const int INTERNAL_SERVER_ERROR = 500;
+        private const int STATUS_CODE_OK = 200;
 
         [Fact]
-        public void Ctor_WithNullEvaluators_ReturnsArgumentNullException()
+        public void Evaluate_WhenRequestContentDoesNotMatchCondition_ReturnsInternalServerError()
         {
-            Action exceptionThrowingAction = () => new RulesEvaluator(null);
+            string responseContent = "None of evaluators could create a response.";
 
-            exceptionThrowingAction.Should().Throw<ArgumentNullException>();
-        }
-
-        [Fact]
-        public void Ctor_WhenOneOfTheEvaluatorsIsNull_ReturnsArgumentNullException()
-        {
-            Action exceptionThrowingAction = () => new RulesEvaluator(new IEvaluator[]{null,new DummyEvaluator()});
-
-            exceptionThrowingAction.Should().Throw<ArgumentNullException>();
-        }
-
-        [Fact]
-        public void Evaluate_WhenAnEvaluatorReturnsNullResponse_ReturnsInternalServerErrorResponse()
-        {
-            var rulesEvaluator = new RulesEvaluator(new IEvaluator[]
-                                                    {
-                                                        new DummyEvaluator(),
-                                                        new NullResponseReturningEvaluator()
-                                                    });
-
-            string responseContent = "if match found, this text will be returned.";
             var imposter = new ImposterDefinition("test")
                     .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
-                    .When(r => r.RequestHeader.Contains("Accept"))
-                    .Then(new DummyResponseCreator(responseContent))
+                    .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
+                                                  "match this text"))
+                    .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
                     .Build();
 
-            List<KeyValuePair<string, StringValues>> keyValuePairs
-                    = new List<KeyValuePair<string, StringValues>>
-                      {
-                          new KeyValuePair<string, StringValues>("Accept",
-                                                                 new StringValues(new[]
-                                                                                  {
-                                                                                      "text/plain",
-                                                                                      "text/xml"
-                                                                                  }))
-                      };
+            var request = new RequestBuilder()
+                    .WithRequestContent("test content")
+                    .Build();
 
-            var request = BuildRequestWithHeaders(keyValuePairs);
+            var response = RulesEvaluator.Evaluate(imposter, request);
 
-            var response = rulesEvaluator.Evaluate(imposter, request);
-
-            response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR_CODE);
+            response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR);
+            response.Content.Should().Be(responseContent);
         }
 
-        private Request BuildRequestWithHeaders(List<KeyValuePair<string, StringValues>> keyValuePairs)
+        [Fact]
+        public void Evaluate_WhenRequestHeaderDoesNotExistsAndConditionIsDefinedForRequestHeader_ReturnsInternalServerError()
         {
-            var requestHeader = new RequestHeader();
+            string responseContent = "None of evaluators could create a response.";
 
-            foreach (KeyValuePair<string, StringValues> keyValuePair in keyValuePairs)
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new []
+                                                                              {
+                                                                                  "text/plain",
+                                                                                  "test/xml"
+                                                                              }))
+                    .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR);
+            response.Content.Should().Be(responseContent);
+        }
+
+        [Fact]
+        public void Evaluate_WhenRequestContentDoesNotExistsAndConditionIsDefinedForRequestContent_ReturnsInternalServerError()
+        {
+            string responseContent = "None of evaluators could create a response.";
+
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
+                                                  "match this text"))
+                    .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR);
+            response.Content.Should().Be(responseContent);
+        }
+
+        [Fact]
+        public void Evaluate_WhenRequestContentMatchesTheCondition_ReturnsPreDefinedResponse()
+        {
+            string requestContent = "dummy request";
+            string responseContent = "dummy response.";
+
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.Content.Contains(requestContent))
+                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .WithRequestContent(requestContent)
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(STATUS_CODE_OK);
+            response.Content.Should().Be(responseContent);
+        }
+
+        [Fact]
+        public void Evaluate_WhenRequestHeaderMatchesTheCondition_ReturnsPreDefinedResponse()
+        {
+            string headerKey = "Accept";
+            var headerValues = new string[]
+                              {
+                                  "text/xml",
+                                  "text/plain"
+                              };
+
+            string responseContent = "dummy response.";
+
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
+                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .WithRequestHeader(headerKey, headerValues)
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(STATUS_CODE_OK);
+            response.Content.Should().Be(responseContent);
+        }
+
+        [Fact]
+        public void Evaluate_WhenRequestHeaderMatchesButRequestContentDoesNotMatchTheCondition_ReturnsPreDefinedResponse()
+        {
+            string headerKey = "Accept";
+            var headerValues = new string[]
+                              {
+                                  "text/xml",
+                                  "text/plain"
+                              };
+
+            string requestContent = "this content will not match the condition";
+            string responseContent = "dummy response.";
+
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
+                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                    .When(r=> r.Content.Contains(requestContent))
+                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .WithRequestHeader(headerKey, headerValues)
+                    .WithRequestContent("dummy request")
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(STATUS_CODE_OK);
+            response.Content.Should().Be(responseContent);
+        }
+
+        [Fact]
+        public void Evaluate_PredefinedResponseCorrespondingToTheMatchedHeaderConditionIsReturned()
+        {
+            string headerKey = "Accept";
+            var headerValues = new string[]
+                              {
+                                  "text/xml",
+                                  "text/plain"
+                              };
+
+            string requestContent = "this content will not match the condition";
+            string responseContent = "dummy response for matched header";
+
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
+                    .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
+                    .When(r => r.Content.Contains(requestContent))
+                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .WithRequestHeader(headerKey, headerValues)
+                    .WithRequestContent("dummy request")
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(STATUS_CODE_OK);
+            response.Content.Should().Be(responseContent);
+        }
+
+        [Fact]
+        public void Evaluate_PredefinedResponseCorrespondingToTheMatchedContentConditionIsReturned()
+        {
+            string headerKey = "this_key_doesnt_not_match";
+            var headerValues = new string[]
+                              {
+                                  "text1/xml1",
+                                  "text1/plain1"
+                              };
+
+            string requestContent = "dummy request";
+            string responseContent = "dummy response for matched header";
+
+            var imposter = new ImposterDefinition("test")
+                    .IsOfType(ImposterType.REST)
+                    .StubsResource("/test")
+                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new[]{"test"}))
+                    .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
+                    .When(r => r.Content.Contains(requestContent))
+                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                    .Build();
+
+            var request = new RequestBuilder()
+                    .WithRequestHeader(headerKey, headerValues)
+                    .WithRequestContent(requestContent)
+                    .Build();
+
+            var response = RulesEvaluator.Evaluate(imposter, request);
+
+            response.StatusCode.Should().Be(STATUS_CODE_OK);
+            response.Content.Should().Be(responseContent);
+        }
+
+        internal class DummyResponseCreator: IResponseCreator
+        {
+            private readonly string _content;
+            private readonly int _statusCode;
+
+            public DummyResponseCreator(string content, int statusCode)
             {
-                requestHeader.Add(keyValuePair.Key, keyValuePair.Value.ToArray());
+                _content = content;
+                _statusCode = statusCode;
             }
 
-            return new Request()
-                   {
-                       RequestHeader = requestHeader
-                   };
+            public Response CreateResponse()
+            {
+                return new Response()
+                       {
+                           Content = _content,
+                           StatusCode = _statusCode
+                       };
+            }
         }
-    }
 
-    internal class DummyEvaluator: IEvaluator
-    {
-        public EvaluationResult Evaluate(Imposter imposter, Request request)
+        internal class DummyResponseForMatchedHeader: IResponseCreator
         {
-            return new EvaluationResult(RuleEvaluationOutcome.FoundAMatch,
-                                        new Response());
-        }
-    }
+            private readonly string _content;
+            private readonly int _statusCode;
 
-    internal class NullResponseReturningEvaluator: IEvaluator
-    {
-        EvaluationResult IEvaluator.Evaluate(Imposter imposter, Request request)
-        {
-            return new EvaluationResult(RuleEvaluationOutcome.NoMatchesFound, null);
+            public DummyResponseForMatchedHeader(string content, int statusCode)
+            {
+                _content = content;
+                _statusCode = statusCode;
+            }
+
+            public Response CreateResponse()
+            {
+                return new Response()
+                       {
+                           Content = _content,
+                           StatusCode = _statusCode
+                       };
+            }
         }
     }
 }
+
+

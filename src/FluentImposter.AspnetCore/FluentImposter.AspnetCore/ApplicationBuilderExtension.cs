@@ -15,10 +15,9 @@ namespace FluentImposter.AspnetCore
     public static class ApplicationBuilderExtension
     {
         public static void UseImposters(this IApplicationBuilder applicationBuilder,
-                                        Uri baseUri,
-                                        Imposter[] imposters)
+                                        ImposterConfiguration imposterConfiguration)
         {
-            MapHandlers(imposters,applicationBuilder);
+            MapHandlers(imposterConfiguration.Imposters, applicationBuilder);
         }
 
         private static void MapHandlers(Imposter[] imposters, IApplicationBuilder applicationBuilder)

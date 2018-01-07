@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.AspnetCore",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.AspnetCore.Tests.Integration", "tests\FluentImposter.AspnetCore.Tests.Integration\FluentImposter.AspnetCore.Tests.Integration.csproj", "{A40AE757-DC54-497C-A62B-C8DC1616AA33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.DataStore.AwsDynamoDb", "src\FluentImposter.DataStore.AwsDynamoDb\FluentImposter.DataStore.AwsDynamoDb.csproj", "{008990E4-4275-4EEB-BD64-6F8215404E12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A40AE757-DC54-497C-A62B-C8DC1616AA33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{008990E4-4275-4EEB-BD64-6F8215404E12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{008990E4-4275-4EEB-BD64-6F8215404E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{008990E4-4275-4EEB-BD64-6F8215404E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{008990E4-4275-4EEB-BD64-6F8215404E12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{969962D8-24ED-44E0-AA3F-951A25289D25} = {6C6CAF2F-982F-4755-B756-FD3181B85B89}
 		{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB} = {378E295C-FB89-4011-A0DC-C9E3E1E1C7A7}
 		{A40AE757-DC54-497C-A62B-C8DC1616AA33} = {6C6CAF2F-982F-4755-B756-FD3181B85B89}
+		{008990E4-4275-4EEB-BD64-6F8215404E12} = {378E295C-FB89-4011-A0DC-C9E3E1E1C7A7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F8BF240-FF57-4BA8-8EA9-1C1C4FA5FB94}

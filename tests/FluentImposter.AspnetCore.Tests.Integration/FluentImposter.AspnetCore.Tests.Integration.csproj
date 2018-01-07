@@ -262,6 +262,10 @@
       <Project>{633044e5-4073-4bca-a79e-8e8f5e3af3c4}</Project>
       <Name>FluentImposter.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\FluentImposter.DataStore.AwsDynamoDb\FluentImposter.DataStore.AwsDynamoDb.csproj">
+      <Project>{008990e4-4275-4eeb-bd64-6f8215404e12}</Project>
+      <Name>FluentImposter.DataStore.AwsDynamoDb</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

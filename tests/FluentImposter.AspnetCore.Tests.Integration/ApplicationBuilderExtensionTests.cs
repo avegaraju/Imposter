@@ -74,7 +74,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                        .AddHeader("this_key_wont_match", "this_too_wont_match")
                                        .PostAsync();
 
-                //response.StatusCode.Should().Be(500);
                 response.Content.ReadAsStringAsync().Result.Should().Be("None of evaluators could create a response.");
             }
         }

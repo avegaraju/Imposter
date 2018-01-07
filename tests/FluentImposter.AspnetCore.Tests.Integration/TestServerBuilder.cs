@@ -2,6 +2,7 @@
 
 using FluentImposter.Core;
 using FluentImposter.Core.Entities;
+using FluentImposter.DataStore.AwsDynamoDb;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,11 +29,14 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
         {
-            Action<IApplicationBuilder> action = app => app.UseImposters(new Uri("http://localhost:8080"),
-                                             new[]
-                                             {
-                                                 imposter,
-                                             });
+
+            var imposterConfiguration = new ImposterConfiguration(new[]
+                                                                  {
+                                                                      imposter
+                                                                  });
+
+            Action<IApplicationBuilder> action =
+                    app => app.UseImposters(imposterConfiguration);
 
             _webHostBuilder.Configure(action);
 

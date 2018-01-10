@@ -14,9 +14,13 @@ namespace FluentImposter.AspnetCore
 {
     public static class ApplicationBuilderExtension
     {
+        private static IDataStore _dataStore;
+
         public static void UseImposters(this IApplicationBuilder applicationBuilder,
                                         ImposterConfiguration imposterConfiguration)
         {
+            _dataStore = imposterConfiguration.DataStore;
+
             MapHandlers(imposterConfiguration.Imposters, applicationBuilder);
         }
 

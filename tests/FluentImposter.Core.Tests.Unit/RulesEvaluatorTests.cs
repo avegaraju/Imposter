@@ -18,7 +18,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
                                                   "match this text"))
@@ -41,7 +40,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new []
                                                                               {
@@ -66,7 +64,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
                                                   "match this text"))
@@ -89,7 +86,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.Content.Contains(requestContent))
                     .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
@@ -118,7 +114,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
                     .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
@@ -148,7 +143,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
                     .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
@@ -181,7 +175,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response for matched header";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
                     .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
@@ -214,7 +207,6 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response for matched header";
 
             var imposter = new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new[]{"test"}))
                     .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))

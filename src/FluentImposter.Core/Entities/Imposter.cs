@@ -11,18 +11,13 @@ namespace FluentImposter.Core.Entities
 
         public string Name { get; }
         public string Resource { get; private set; }
-        public ImposterType Type { get; private set; }
+        public ImposterBehavior Behavior { get; private set; }
         public IEnumerable<Rule> Rules => _rules;
 
         internal Imposter(string name)
         {
             Name = name;
             _rules = new List<Rule>();
-        }
-
-        internal void SetType(ImposterType type)
-        {
-            Type = type;
         }
 
         internal void CreateRuleCondition(Expression<Func<Request,bool>> condition)
@@ -41,6 +36,11 @@ namespace FluentImposter.Core.Entities
         internal void SetResource(string resourcePath)
         {
             Resource = resourcePath;
+        }
+
+        internal void SetBehavior(ImposterBehavior imposterBehavior)
+        {
+            Behavior = imposterBehavior;
         }
     }
 }

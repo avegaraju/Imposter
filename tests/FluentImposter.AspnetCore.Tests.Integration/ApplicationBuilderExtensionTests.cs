@@ -84,7 +84,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.Content.Contains("dummy"))
                     .Then(new DummyResponseCreator())
@@ -97,7 +96,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
                                                                     new[]
@@ -115,7 +113,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .IsOfType(ImposterType.REST)
                     .StubsResource("/test")
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
                                                                     new[]

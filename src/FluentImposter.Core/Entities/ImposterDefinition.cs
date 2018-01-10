@@ -2,10 +2,6 @@
 
 namespace FluentImposter.Core.Entities
 {
-    public enum ImposterType
-    {
-        REST
-    }
     public class ImposterDefinition
     {
         private readonly Imposter _imposter;
@@ -14,11 +10,21 @@ namespace FluentImposter.Core.Entities
         {
             _imposter = new Imposter(imposterName);
         }
-        public ImposterStub IsOfType(ImposterType type)
-        {
-            _imposter.SetType(type);
 
-            return new ImposterStub(_imposter);
+        public ImposterRule StubsResource(string resourcePath)
+        {
+            _imposter.SetResource(resourcePath);
+            _imposter.SetBehavior(ImposterBehavior.Stub);
+
+            return new ImposterRule(_imposter);
+        }
+
+        public ImposterRule MocksResource(string resourcePath)
+        {
+            _imposter.SetResource(resourcePath);
+            _imposter.SetBehavior(ImposterBehavior.Mock);
+
+            return new ImposterRule(_imposter);
         }
     }
 }

@@ -2,19 +2,19 @@
 
 namespace FluentImposter.Core.Builders
 {
-    public class ImposterStub
+    public class ImposterMock
     {
         private readonly Imposter _imposter;
 
-        public ImposterStub(Imposter imposter)
+        public ImposterMock(Imposter imposter)
         {
             _imposter = imposter;
         }
 
-        public ImposterRule StubsResource(string resourcePath)
+        public ImposterRule MocksResource(string resourcePath)
         {
             _imposter.SetResource(resourcePath);
-            _imposter.SetBehavior(ImposterBehavior.Stub);
+            _imposter.SetBehavior(ImposterBehavior.Mock);
 
             return new ImposterRule(_imposter);
         }

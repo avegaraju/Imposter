@@ -1,4 +1,6 @@
-﻿using FluentImposter.Core.Builders;
+﻿using System.Net.Http;
+
+using FluentImposter.Core.Builders;
 
 namespace FluentImposter.Core.Entities
 {
@@ -11,18 +13,20 @@ namespace FluentImposter.Core.Entities
             _imposter = new Imposter(imposterName);
         }
 
-        public ImposterRule StubsResource(string resourcePath)
+        public ImposterRule StubsResource(string resourcePath, HttpMethod method)
         {
             _imposter.SetResource(resourcePath);
             _imposter.SetBehavior(ImposterBehavior.Stub);
+            _imposter.SetMethod(method);
 
             return new ImposterRule(_imposter);
         }
 
-        public ImposterRule MocksResource(string resourcePath)
+        public ImposterRule MocksResource(string resourcePath, HttpMethod method)
         {
             _imposter.SetResource(resourcePath);
             _imposter.SetBehavior(ImposterBehavior.Mock);
+            _imposter.SetMethod(method);
 
             return new ImposterRule(_imposter);
         }

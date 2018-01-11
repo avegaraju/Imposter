@@ -1,9 +1,11 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 
 using FluentAssertions;
 
-using FluentImposter.Core;
-using FluentImposter.Core.Entities;
+using FluentImposter.AspnetCore.Tests.Integration.Fakes;
+using FluentImposter.AspnetCore.Tests.Integration.Spies;
 
 using Xunit;
 
@@ -15,17 +17,17 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithMatchingContent_ReturnsPreDefinedResponse()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new DummyImposterWithRequestContent().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent().Build())
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/test")
+                                       .CreateRequest("test")
                                        .And(message =>
                                             {
                                                 message.Content =
                                                         new StringContent("dummy");
                                             })
-                                       .PostAsync();
+                                       .GetAsync();
 
                 var content = response.Content.ReadAsStringAsync().Result;
 
@@ -37,11 +39,11 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithMatchingHeader_ReturnsPreDefinedResponse()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new DummyImposterWithRequestHeader().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestHeader().Build())
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/test")
+                                       .CreateRequest("test")
                                        .And(message =>
                                             {
                                                 message.Content =
@@ -61,11 +63,11 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithoutAnyMatchingConditions_ReturnsInternalServerError()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new DummyImposterWithRequestHeaderAndContent().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestHeaderAndContent().Build())
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/test")
+                                       .CreateRequest("test")
                                        .And(message =>
                                             {
                                                 message.Content =
@@ -77,53 +79,84 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 response.Content.ReadAsStringAsync().Result.Should().Be("None of evaluators could create a response.");
             }
         }
-    }
 
-    internal class DummyImposterWithRequestContent : IImposter
-    {
-        public Imposter Build()
+        [Fact]
+        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsGet_ReturnsNotFound()
         {
-            return new ImposterDefinition("test")
-                    .StubsResource("/test")
-                    .When(r => r.Content.Contains("dummy"))
-                    .Then(new DummyResponseCreator())
-                    .Build();
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent().Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("mocks/session")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .GetAsync();
+
+                response.StatusCode
+                        .Should().Be(HttpStatusCode.NotFound);
+                spyDataStore.NewSessionId
+                            .Should().Be(Guid.Empty);
+            }
         }
-    }
 
-    internal class DummyImposterWithRequestHeader : IImposter
-    {
-        public Imposter Build()
+        [Fact]
+        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WithoutADataStore_ReturnsInternalServerError()
         {
-            return new ImposterDefinition("test")
-                    .StubsResource("/test")
-                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
-                                                                    new[]
-                                                                    {
-                                                                        "text/plain",
-                                                                        "text/xml"
-                                                                    }))
-                    .Then(new DummyResponseCreator())
-                    .Build();
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent().Build())
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("mocks/session")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                response.StatusCode
+                        .Should().Be(HttpStatusCode.InternalServerError);
+                response.Content.ReadAsStringAsync().Result
+                        .Should().Be("No data store configured to enable mocking.");
+            }
         }
-    }
 
-    internal class DummyImposterWithRequestHeaderAndContent : IImposter
-    {
-        public Imposter Build()
+        [Fact]
+        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsPost_ReturnsCreatedWithValidSession()
         {
-            return new ImposterDefinition("test")
-                    .StubsResource("/test")
-                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
-                                                                    new[]
-                                                                    {
-                                                                        "text/plain",
-                                                                        "text/xml"
-                                                                    }))
-                    .Then(new DummyResponseCreator())
-                    .When(r => r.Content.Contains("dummy request"))
-                    .Then(new DummyResponseCreator())
-                    .Build();
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent().Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("/mocks/session")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                response.StatusCode
+                        .Should().Be(HttpStatusCode.Created);
+
+                spyDataStore.NewSessionId
+                    .Should().Be(response.Content.ReadAsStringAsync().Result);
+            }
         }
     }
 }

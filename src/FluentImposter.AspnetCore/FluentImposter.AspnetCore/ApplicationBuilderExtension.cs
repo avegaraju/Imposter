@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 using FluentImposter.Core;
@@ -8,6 +8,7 @@ using FluentImposter.Core.Entities;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 
 namespace FluentImposter.AspnetCore
@@ -21,57 +22,110 @@ namespace FluentImposter.AspnetCore
         {
             _dataStore = imposterConfiguration.DataStore;
 
-            MapHandlers(imposterConfiguration.Imposters, applicationBuilder);
+            CreateRoutes(imposterConfiguration.Imposters, applicationBuilder);
         }
 
-        private static void MapHandlers(Imposter[] imposters, IApplicationBuilder applicationBuilder)
+        private static void CreateRoutes(Imposter[] imposters,
+                                        IApplicationBuilder applicationBuilder)
         {
-            foreach (var imposter in imposters)
+            CreateRoutesForMocking(applicationBuilder);
+
+            CreateRoutesForImposterResources(imposters, applicationBuilder);
+        }
+
+        private static void CreateRoutesForMocking(IApplicationBuilder applicationBuilder)
+        {
+            CreateMockingSessionRoute(applicationBuilder);
+        }
+
+        private static void CreateMockingSessionRoute(IApplicationBuilder applicationBuilder)
+        {
+            applicationBuilder
+                    .UseRouter(routeBuilder =>
+                               {
+                                   routeBuilder.MapVerb("Post",
+                                                        "mocks/session",
+                                                        CreateMockingSessionRequestHandler());
+                               });
+
+            RequestDelegate CreateMockingSessionRequestHandler()
             {
-                applicationBuilder.Map(imposter.Resource,
-                                       app => HandleRequest(app, imposter));
+                return async context =>
+                       {
+                           if (_dataStore != null)
+                           {
+                               await CreateNewMockingSession(context);
+                           }
+                           else
+                           {
+                               await ReturnErrorResponse(context);
+                           }
+                       };
+            }
+
+            async Task CreateNewMockingSession(HttpContext context)
+            {
+                var sessionId = _dataStore.CreateSession();
+
+                context.Response.StatusCode =
+                        (int)HttpStatusCode.Created;
+                await context.Response.WriteAsync(sessionId.ToString());
+            }
+
+            async Task ReturnErrorResponse(HttpContext context)
+            {
+                context.Response.StatusCode =
+                        (int)HttpStatusCode.InternalServerError;
+                await context.Response.WriteAsync("No data store configured to enable mocking.");
             }
         }
 
-        private static void HandleRequest(IApplicationBuilder applicationBuilder, Imposter imposter)
+        private static void CreateRoutesForImposterResources(Imposter[] imposters,
+                                                             IApplicationBuilder applicationBuilder)
         {
-            applicationBuilder.Run(EvaluateImposterRules(imposter));
-        }
-
-        private static RequestDelegate EvaluateImposterRules(Imposter imposter)
-        {
-            return async context =>
+            foreach (var imposter in imposters)
             {
-                using (var streamReader = new StreamReader(context.Request.Body))
-                {
-                    var content = streamReader.ReadToEnd();
+                applicationBuilder
+                        .UseRouter(routeBuilder =>
+                                   {
+                                       routeBuilder.MapVerb(imposter.Method.ToString(),
+                                                            imposter.Resource,
+                                                            EvaluateImposterRules(imposter));
+                                   });
+            }
 
-                    await EvaluateRules(imposter, context, content);
-                }
-            };
-        }
+            RequestDelegate EvaluateImposterRules(Imposter imposter)
+            {
+                return async context =>
+                       {
+                           await EvaluateRules(imposter, context);
+                       };
+            }
 
-        private static async Task EvaluateRules(Imposter imposter, HttpContext context, string content)
-        {
-            var request = BuildRequest(context);
+            async Task EvaluateRules(Imposter imposter,
+                                     HttpContext context)
+            {
+                var request = BuildRequest(context);
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+                var response = RulesEvaluator.Evaluate(imposter, request);
 
-            await context.Response.WriteAsync(response.Content);
+                context.Response.StatusCode = response.StatusCode;
+                await context.Response.WriteAsync(response.Content);
+            }
         }
 
         private static Request BuildRequest(HttpContext context)
         {
             var stream = context.Request.Body;
-            stream.Position = 0;
-
             using (var streamReader = new StreamReader(stream))
             {
-                return new Request()
-                       {
-                           Content = streamReader.ReadToEnd(),
-                           RequestHeader = BuildRequestHeader()
-                       };
+                var request = new Request()
+                {
+                    Content = streamReader.ReadToEnd(),
+                    RequestHeader = BuildRequestHeader()
+                };
+
+                return request;
             }
 
             RequestHeader BuildRequestHeader()

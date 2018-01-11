@@ -21,7 +21,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/test/sklskdlkl")
+                                       .CreateRequest("test")
                                        .And(message =>
                                             {
                                                 message.Content =
@@ -43,7 +43,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/test")
+                                       .CreateRequest("test")
                                        .And(message =>
                                             {
                                                 message.Content =
@@ -67,7 +67,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/test")
+                                       .CreateRequest("test")
                                        .And(message =>
                                             {
                                                 message.Content =

@@ -10,7 +10,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .StubsResource("test", HttpMethod.Get)
                     .When(r => r.Content.Contains("dummy"))
                     .Then(new DummyResponseCreator())
                     .Build();

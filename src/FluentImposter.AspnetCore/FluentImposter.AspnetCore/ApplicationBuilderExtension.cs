@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,8 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 
-using Newtonsoft.Json;
-
 namespace FluentImposter.AspnetCore
 {
     public static class ApplicationBuilderExtension
@@ -25,14 +22,15 @@ namespace FluentImposter.AspnetCore
         {
             _dataStore = imposterConfiguration.DataStore;
 
-            MapHandlers(imposterConfiguration.Imposters, applicationBuilder);
+            CreateRoutes(imposterConfiguration.Imposters, applicationBuilder);
         }
 
-        private static void MapHandlers(Imposter[] imposters, IApplicationBuilder applicationBuilder)
+        private static void CreateRoutes(Imposter[] imposters,
+                                        IApplicationBuilder applicationBuilder)
         {
             CreateRoutesForMocking(applicationBuilder);
 
-            MapImposterResourceAndRequestHandler(imposters, applicationBuilder);
+            CreateRoutesForImposterResources(imposters, applicationBuilder);
         }
 
         private static void CreateRoutesForMocking(IApplicationBuilder applicationBuilder)
@@ -82,38 +80,38 @@ namespace FluentImposter.AspnetCore
             }
         }
 
-        private static void MapImposterResourceAndRequestHandler(Imposter[] imposters,
-                                                                 IApplicationBuilder applicationBuilder)
+        private static void CreateRoutesForImposterResources(Imposter[] imposters,
+                                                             IApplicationBuilder applicationBuilder)
         {
             foreach (var imposter in imposters)
             {
-                applicationBuilder.Map(imposter.Resource,
-                                       app => HandleRequest(app, imposter));
+                applicationBuilder
+                        .UseRouter(routeBuilder =>
+                                   {
+                                       routeBuilder.MapVerb(imposter.Method.ToString(),
+                                                            imposter.Resource,
+                                                            EvaluateImposterRules(imposter));
+                                   });
             }
-        }
 
-        private static void HandleRequest(IApplicationBuilder applicationBuilder, Imposter imposter)
-        {
-            applicationBuilder.Run(EvaluateImposterRules(imposter));
-        }
+            RequestDelegate EvaluateImposterRules(Imposter imposter)
+            {
+                return async context =>
+                       {
+                           await EvaluateRules(imposter, context);
+                       };
+            }
 
-        private static RequestDelegate EvaluateImposterRules(Imposter imposter)
-        {
-            return async context =>
-                   {
-                       await EvaluateRules(imposter, context);
-                   };
-        }
+            async Task EvaluateRules(Imposter imposter,
+                                     HttpContext context)
+            {
+                var request = BuildRequest(context);
 
-        private static async Task EvaluateRules(Imposter imposter,
-                                                HttpContext context)
-        {
-            var request = BuildRequest(context);
+                var response = RulesEvaluator.Evaluate(imposter, request);
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
-
-            context.Response.StatusCode = response.StatusCode;
-            await context.Response.WriteAsync(response.Content);
+                context.Response.StatusCode = response.StatusCode;
+                await context.Response.WriteAsync(response.Content);
+            }
         }
 
         private static Request BuildRequest(HttpContext context)

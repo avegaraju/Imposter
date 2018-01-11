@@ -47,10 +47,10 @@ namespace FluentImposter.AspnetCore
                                {
                                    routeBuilder.MapVerb("Post",
                                                         "mocks/session",
-                                                        CreateMockingSessionHandler());
+                                                        CreateMockingSessionRequestHandler());
                                });
 
-            RequestDelegate CreateMockingSessionHandler()
+            RequestDelegate CreateMockingSessionRequestHandler()
             {
                 return async context =>
                        {

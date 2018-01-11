@@ -81,7 +81,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         }
 
         [Fact]
-        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsGet_ReturnsBadRequest()
+        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsGet_ReturnsNotFound()
         {
             var spyDataStore = new SpyDataStore();
 
@@ -92,7 +92,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                     .Build())
             {
                 var response = await testServer
-                                       .CreateRequest("/mock/createsession")
+                                       .CreateRequest("mock/createsession")
                                        .And(message =>
                                             {
                                                 message.Content =
@@ -101,7 +101,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                        .GetAsync();
 
                 response.StatusCode
-                        .Should().Be(HttpStatusCode.BadRequest);
+                        .Should().Be(HttpStatusCode.NotFound);
                 spyDataStore.NewSessionId
                             .Should().Be(Guid.Empty);
             }

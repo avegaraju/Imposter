@@ -9,7 +9,10 @@ using FluentImposter.Core.Entities;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
+
+using Newtonsoft.Json;
 
 namespace FluentImposter.AspnetCore
 {
@@ -39,8 +42,33 @@ namespace FluentImposter.AspnetCore
 
         private static void MapMockingSessionRequestsAndHandlers(IApplicationBuilder applicationBuilder)
         {
-            applicationBuilder.Map("/mock/createsession",
-                                   app => HandleCreateMockingSessionRequest());
+            applicationBuilder.UseRouter(r =>
+                                         {
+                                             r.MapVerb("Post",
+                                                       "mock/createsession",
+                                                       async context =>
+                                                       {
+                                                           if (IsHttpPostRequest(context))
+                                                           {
+                                                               var sessionId = _dataStore.CreateSession();
+
+                                                               context.Response.StatusCode =
+                                                                       (int)HttpStatusCode.Created;
+                                                               await context.Response.WriteAsync(sessionId.ToString());
+                                                           }
+                                                           else
+                                                           {
+                                                               context.Response.StatusCode =
+                                                                       (int)HttpStatusCode.BadRequest;
+                                                               await context
+                                                                       .Response
+                                                                       .WriteAsync("The resource can only accept POST requests.");
+                                                           }
+                                                       });
+
+                                         });
+            //applicationBuilder.Map("/mock/createsession",
+            //                       app => HandleCreateMockingSessionRequest());
 
             void HandleCreateMockingSessionRequest()
             {
@@ -93,17 +121,13 @@ namespace FluentImposter.AspnetCore
         private static RequestDelegate EvaluateImposterRules(Imposter imposter)
         {
             return async context =>
-            {
-                using (var streamReader = new StreamReader(context.Request.Body))
-                {
-                    var content = streamReader.ReadToEnd();
-
-                    await EvaluateRules(imposter, context, content);
-                }
-            };
+                   {
+                       await EvaluateRules(imposter, context);
+                   };
         }
 
-        private static async Task EvaluateRules(Imposter imposter, HttpContext context, string content)
+        private static async Task EvaluateRules(Imposter imposter,
+                                                HttpContext context)
         {
             var request = BuildRequest(context);
 
@@ -116,15 +140,15 @@ namespace FluentImposter.AspnetCore
         private static Request BuildRequest(HttpContext context)
         {
             var stream = context.Request.Body;
-            stream.Position = 0;
-
             using (var streamReader = new StreamReader(stream))
             {
-                return new Request()
-                       {
-                           Content = streamReader.ReadToEnd(),
-                           RequestHeader = BuildRequestHeader()
-                       };
+                var request = new Request()
+                {
+                    Content = streamReader.ReadToEnd(),
+                    RequestHeader = BuildRequestHeader()
+                };
+
+                return request;
             }
 
             RequestHeader BuildRequestHeader()

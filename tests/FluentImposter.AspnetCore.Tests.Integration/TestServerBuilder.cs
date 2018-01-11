@@ -8,6 +8,7 @@ using FluentImposter.Core.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentImposter.AspnetCore.Tests.Integration
 {
@@ -19,6 +20,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public TestServerBuilder()
         {
             _webHostBuilder = new WebHostBuilder();
+            _webHostBuilder.ConfigureServices(sc => sc.AddRouting());
         }
 
         public TestServer Build()

@@ -2,8 +2,7 @@
 
 using FluentAssertions;
 
-using FluentImposter.Core;
-using FluentImposter.Core.Entities;
+using FluentImposter.AspnetCore.Tests.Integration.Fakes;
 
 using Xunit;
 
@@ -15,7 +14,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithMatchingContent_ReturnsPreDefinedResponse()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new DummyImposterWithRequestContent().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent().Build())
                     .Build())
             {
                 var response = await testServer
@@ -37,7 +36,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithMatchingHeader_ReturnsPreDefinedResponse()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new DummyImposterWithRequestHeader().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestHeader().Build())
                     .Build())
             {
                 var response = await testServer
@@ -61,7 +60,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithoutAnyMatchingConditions_ReturnsInternalServerError()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new DummyImposterWithRequestHeaderAndContent().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestHeaderAndContent().Build())
                     .Build())
             {
                 var response = await testServer
@@ -76,54 +75,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
                 response.Content.ReadAsStringAsync().Result.Should().Be("None of evaluators could create a response.");
             }
-        }
-    }
-
-    internal class DummyImposterWithRequestContent : IImposter
-    {
-        public Imposter Build()
-        {
-            return new ImposterDefinition("test")
-                    .StubsResource("/test")
-                    .When(r => r.Content.Contains("dummy"))
-                    .Then(new DummyResponseCreator())
-                    .Build();
-        }
-    }
-
-    internal class DummyImposterWithRequestHeader : IImposter
-    {
-        public Imposter Build()
-        {
-            return new ImposterDefinition("test")
-                    .StubsResource("/test")
-                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
-                                                                    new[]
-                                                                    {
-                                                                        "text/plain",
-                                                                        "text/xml"
-                                                                    }))
-                    .Then(new DummyResponseCreator())
-                    .Build();
-        }
-    }
-
-    internal class DummyImposterWithRequestHeaderAndContent : IImposter
-    {
-        public Imposter Build()
-        {
-            return new ImposterDefinition("test")
-                    .StubsResource("/test")
-                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
-                                                                    new[]
-                                                                    {
-                                                                        "text/plain",
-                                                                        "text/xml"
-                                                                    }))
-                    .Then(new DummyResponseCreator())
-                    .When(r => r.Content.Contains("dummy request"))
-                    .Then(new DummyResponseCreator())
-                    .Build();
         }
     }
 }

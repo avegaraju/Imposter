@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 using FluentImposter.Core;
@@ -25,6 +26,55 @@ namespace FluentImposter.AspnetCore
         }
 
         private static void MapHandlers(Imposter[] imposters, IApplicationBuilder applicationBuilder)
+        {
+            MapMockRequestsAndMockHandlers(applicationBuilder);
+
+            MapImposterResourceAndRequestHandler(imposters, applicationBuilder);
+        }
+
+        private static void MapMockRequestsAndMockHandlers(IApplicationBuilder applicationBuilder)
+        {
+            MapMockingSessionRequestsAndHandlers(applicationBuilder);
+        }
+
+        private static void MapMockingSessionRequestsAndHandlers(IApplicationBuilder applicationBuilder)
+        {
+            applicationBuilder.Map("/mock/createsession",
+                                   app => HandleCreateMockingSessionRequest());
+
+            void HandleCreateMockingSessionRequest()
+            {
+                applicationBuilder.Run(CreateMockingSession());
+            }
+
+            RequestDelegate CreateMockingSession()
+            {
+                return async context =>
+                {
+                    if (IsHttpPostRequest(context))
+                    {
+                        var sessionId = _dataStore.CreateSession();
+
+                        context.Response.StatusCode = (int)HttpStatusCode.Created;
+                        await context.Response.WriteAsync(sessionId.ToString());
+                    }
+
+                    context.Response.StatusCode = (int)HttpStatusCode.BadGateway;
+                    await context.Response.WriteAsync("The resource can only accept POST requests.");
+                };
+            }
+        }
+
+        private static bool IsHttpPostRequest(HttpContext context)
+        {
+            return context
+                    .Request
+                    .Method
+                    .Equals(HttpMethods.Post, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void MapImposterResourceAndRequestHandler(Imposter[] imposters,
+                                                                 IApplicationBuilder applicationBuilder)
         {
             foreach (var imposter in imposters)
             {
@@ -57,6 +107,7 @@ namespace FluentImposter.AspnetCore
 
             var response = RulesEvaluator.Evaluate(imposter, request);
 
+            context.Response.StatusCode = response.StatusCode;
             await context.Response.WriteAsync(response.Content);
         }
 

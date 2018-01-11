@@ -244,6 +244,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationBuilderExtensionTests.cs" />
+    <Compile Include="Fakes\FakeImposterWithRequestContent.cs" />
+    <Compile Include="Fakes\FakeImposterWithRequestHeader.cs" />
+    <Compile Include="Fakes\FakeImposterWithRequestHeaderAndContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestServerBuilder.cs" />
   </ItemGroup>

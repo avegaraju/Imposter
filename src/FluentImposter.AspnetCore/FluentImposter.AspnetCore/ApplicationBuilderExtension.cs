@@ -58,9 +58,11 @@ namespace FluentImposter.AspnetCore
                         context.Response.StatusCode = (int)HttpStatusCode.Created;
                         await context.Response.WriteAsync(sessionId.ToString());
                     }
-
-                    context.Response.StatusCode = (int)HttpStatusCode.BadGateway;
-                    await context.Response.WriteAsync("The resource can only accept POST requests.");
+                    else
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        await context.Response.WriteAsync("The resource can only accept POST requests.");
+                    }
                 };
             }
         }

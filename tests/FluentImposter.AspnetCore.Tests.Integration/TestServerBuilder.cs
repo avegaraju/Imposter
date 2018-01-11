@@ -1,8 +1,9 @@
 ﻿using System;
 
+using FluentImposter.AspnetCore.Tests.Integration.Fakes;
+using FluentImposter.AspnetCore.Tests.Integration.Spies;
 using FluentImposter.Core;
 using FluentImposter.Core.Entities;
-using FluentImposter.DataStore.AwsDynamoDb;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,11 +30,27 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
         {
-
             var imposterConfiguration = new ImposterConfiguration(new[]
                                                                   {
                                                                       imposter
                                                                   });
+
+            Action<IApplicationBuilder> action =
+                    app => app.UseImposters(imposterConfiguration);
+
+            _webHostBuilder.Configure(action);
+
+            return this;
+        }
+
+        public TestServerBuilder UsingImposterMiddleWareWithSpyDataStore(Imposter imposter,
+                                                                            IDataStore spyDataStore)
+        {
+            var imposterConfiguration = new ImposterConfiguration(new[]
+                                                                  {
+                                                                      imposter
+                                                                  })
+                    .UseSpyDataStore(spyDataStore);
 
             Action<IApplicationBuilder> action =
                     app => app.UseImposters(imposterConfiguration);

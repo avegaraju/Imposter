@@ -1,4 +1,6 @@
-﻿using FluentImposter.Core;
+﻿using System.Net.Http;
+
+using FluentImposter.Core;
 using FluentImposter.Core.Entities;
 
 namespace SampleClientService
@@ -8,7 +10,7 @@ namespace SampleClientService
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .StubsResource("/users")
+                    .StubsResource("/users", HttpMethod.Post)
                     .When(r => r.Content.Contains("abc@xyz.com"))
                     .Then(new DummyResponseCreator())
                     .Build();

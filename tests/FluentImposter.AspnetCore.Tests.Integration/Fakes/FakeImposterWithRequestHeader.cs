@@ -1,4 +1,6 @@
-﻿using FluentImposter.Core;
+﻿using System.Net.Http;
+
+using FluentImposter.Core;
 using FluentImposter.Core.Entities;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
@@ -8,7 +10,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .StubsResource("/test")
+                    .StubsResource("/test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
                                                                     new[]
                                                                     {

@@ -30,77 +30,46 @@ namespace FluentImposter.AspnetCore
 
         private static void MapHandlers(Imposter[] imposters, IApplicationBuilder applicationBuilder)
         {
-            MapMockRequestsAndMockHandlers(applicationBuilder);
+            CreateRoutesForMocking(applicationBuilder);
 
             MapImposterResourceAndRequestHandler(imposters, applicationBuilder);
         }
 
-        private static void MapMockRequestsAndMockHandlers(IApplicationBuilder applicationBuilder)
+        private static void CreateRoutesForMocking(IApplicationBuilder applicationBuilder)
         {
-            MapMockingSessionRequestsAndHandlers(applicationBuilder);
+            CreateMockingSessionRoute(applicationBuilder);
         }
 
-        private static void MapMockingSessionRequestsAndHandlers(IApplicationBuilder applicationBuilder)
+        private static void CreateMockingSessionRoute(IApplicationBuilder applicationBuilder)
         {
-            applicationBuilder.UseRouter(r =>
-                                         {
-                                             r.MapVerb("Post",
-                                                       "mock/createsession",
-                                                       async context =>
-                                                       {
-                                                           if (IsHttpPostRequest(context))
-                                                           {
-                                                               var sessionId = _dataStore.CreateSession();
+            applicationBuilder
+                    .UseRouter(routeBuilder =>
+                               {
+                                   routeBuilder.MapVerb("Post",
+                                                        "mocks/session",
+                                                        CreateMockingSessionHandler());
+                               });
 
-                                                               context.Response.StatusCode =
-                                                                       (int)HttpStatusCode.Created;
-                                                               await context.Response.WriteAsync(sessionId.ToString());
-                                                           }
-                                                           else
-                                                           {
-                                                               context.Response.StatusCode =
-                                                                       (int)HttpStatusCode.BadRequest;
-                                                               await context
-                                                                       .Response
-                                                                       .WriteAsync("The resource can only accept POST requests.");
-                                                           }
-                                                       });
-
-                                         });
-            //applicationBuilder.Map("/mock/createsession",
-            //                       app => HandleCreateMockingSessionRequest());
-
-            void HandleCreateMockingSessionRequest()
-            {
-                applicationBuilder.Run(CreateMockingSession());
-            }
-
-            RequestDelegate CreateMockingSession()
+            RequestDelegate CreateMockingSessionHandler()
             {
                 return async context =>
-                {
-                    if (IsHttpPostRequest(context))
-                    {
-                        var sessionId = _dataStore.CreateSession();
+                       {
+                           if (_dataStore != null)
+                           {
+                               var sessionId = _dataStore.CreateSession();
 
-                        context.Response.StatusCode = (int)HttpStatusCode.Created;
-                        await context.Response.WriteAsync(sessionId.ToString());
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                        await context.Response.WriteAsync("The resource can only accept POST requests.");
-                    }
-                };
+                               context.Response.StatusCode =
+                                       (int)HttpStatusCode.Created;
+                               await context.Response.WriteAsync(sessionId.ToString());
+                           }
+                           else
+                           {
+                               context.Response.StatusCode =
+                                       (int)HttpStatusCode.InternalServerError;
+                               await context.Response.WriteAsync("No data store configured to enable mocking.");
+                           }
+                       };
             }
-        }
-
-        private static bool IsHttpPostRequest(HttpContext context)
-        {
-            return context
-                    .Request
-                    .Method
-                    .Equals(HttpMethods.Post, StringComparison.OrdinalIgnoreCase);
         }
 
         private static void MapImposterResourceAndRequestHandler(Imposter[] imposters,

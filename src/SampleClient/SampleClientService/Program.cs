@@ -14,12 +14,6 @@ namespace SampleClientService
                    .UseKestrel()
                    .UseStartup<Startup>()
                    .Build();
-            //var webHost = new WebHostBuilder()
-            //        .UseKestrel()
-            //        .UseStartup(typeof (Startup))
-            //        .Build();
-
-            //webHost.Start();
 
             host.Start();
 

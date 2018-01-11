@@ -56,19 +56,29 @@ namespace FluentImposter.AspnetCore
                        {
                            if (_dataStore != null)
                            {
-                               var sessionId = _dataStore.CreateSession();
-
-                               context.Response.StatusCode =
-                                       (int)HttpStatusCode.Created;
-                               await context.Response.WriteAsync(sessionId.ToString());
+                               await CreateNewMockingSession(context);
                            }
                            else
                            {
-                               context.Response.StatusCode =
-                                       (int)HttpStatusCode.InternalServerError;
-                               await context.Response.WriteAsync("No data store configured to enable mocking.");
+                               await ReturnErrorResponse(context);
                            }
                        };
+            }
+
+            async Task CreateNewMockingSession(HttpContext context)
+            {
+                var sessionId = _dataStore.CreateSession();
+
+                context.Response.StatusCode =
+                        (int)HttpStatusCode.Created;
+                await context.Response.WriteAsync(sessionId.ToString());
+            }
+
+            async Task ReturnErrorResponse(HttpContext context)
+            {
+                context.Response.StatusCode =
+                        (int)HttpStatusCode.InternalServerError;
+                await context.Response.WriteAsync("No data store configured to enable mocking.");
             }
         }
 

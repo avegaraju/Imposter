@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using FluentImposter.AspnetCore;
+﻿using FluentImposter.AspnetCore;
 using FluentImposter.Core;
 
 using Microsoft.AspNetCore.Builder;

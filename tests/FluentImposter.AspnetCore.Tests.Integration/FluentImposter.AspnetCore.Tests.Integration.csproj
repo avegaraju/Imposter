@@ -259,7 +259,7 @@
     <Analyzer Include="..\..\packages\xunit.analyzers.0.7.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluentImposter.AspnetCore\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj">
+    <ProjectReference Include="..\..\src\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj">
       <Project>{008ffbf2-4fa5-4c48-a05a-00217b2ee7cb}</Project>
       <Name>FluentImposter.AspnetCore</Name>
     </ProjectReference>

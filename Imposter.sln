@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.Core", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.Core.Tests.Unit", "tests\FluentImposter.Core.Tests.Unit\FluentImposter.Core.Tests.Unit.csproj", "{969962D8-24ED-44E0-AA3F-951A25289D25}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.AspnetCore", "src\FluentImposter.AspnetCore\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj", "{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.AspnetCore", "src\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj", "{008FFBF2-4FA5-4C48-A05A-00217B2EE7CB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.AspnetCore.Tests.Integration", "tests\FluentImposter.AspnetCore.Tests.Integration\FluentImposter.AspnetCore.Tests.Integration.csproj", "{A40AE757-DC54-497C-A62B-C8DC1616AA33}"
 EndProject

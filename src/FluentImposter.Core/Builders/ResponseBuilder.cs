@@ -1,6 +1,9 @@
-﻿using FluentImposter.Core.Builders;
+﻿using System.IO;
+using System.Text;
 
-namespace FluentImposter.Core.Entities
+using FluentImposter.Core.Entities;
+
+namespace FluentImposter.Core.Builders
 {
     public class ResponseBuilder
     {
@@ -13,6 +16,13 @@ namespace FluentImposter.Core.Entities
         public ResponseStatusCode WithContent(string content)
         {
             _response.Content = content;
+
+            return new ResponseStatusCode(_response, this);
+        }
+
+        public ResponseStatusCode WithContent(object content, IContentSerializer contentSerializer)
+        {
+            _response.Content = contentSerializer.Serialize(content);
 
             return new ResponseStatusCode(_response, this);
         }

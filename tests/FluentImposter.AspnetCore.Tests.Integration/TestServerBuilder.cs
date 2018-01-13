@@ -3,6 +3,7 @@
 using FluentImposter.AspnetCore.Tests.Integration.Fakes;
 using FluentImposter.AspnetCore.Tests.Integration.Spies;
 using FluentImposter.Core;
+using FluentImposter.Core.Builders;
 using FluentImposter.Core.Entities;
 
 using Microsoft.AspNetCore.Builder;

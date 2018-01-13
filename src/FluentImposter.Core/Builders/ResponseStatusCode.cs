@@ -1,4 +1,6 @@
-﻿using FluentImposter.Core.Entities;
+﻿using System.Net;
+
+using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core.Builders
 {
@@ -14,9 +16,9 @@ namespace FluentImposter.Core.Builders
             _responseDefinition = responseDefinition;
         }
 
-        public ResponseBuilder WithStatusCode(int statusCode)
+        public ResponseBuilder WithStatusCode(HttpStatusCode statusCode)
         {
-            _response.StatusCode = statusCode;
+            _response.StatusCode = (int)statusCode;
 
             return _responseDefinition;
         }

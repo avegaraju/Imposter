@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -23,7 +24,7 @@ namespace FluentImposter.Core.Tests.Unit
 
             var response = new ResponseBuilder()
                     .WithContent("test content")
-                    .WithStatusCode(200)
+                    .WithStatusCode(HttpStatusCode.OK)
                     .Build();
 
             response.Content.Should().Be(responseContent);
@@ -42,7 +43,7 @@ namespace FluentImposter.Core.Tests.Unit
 
             var response = new ResponseBuilder()
                     .WithContent(dummyUserResponseObject, new JsonContentSerializer() )
-                    .WithStatusCode(200)
+                    .WithStatusCode(HttpStatusCode.OK)
                     .Build();
 
             
@@ -65,7 +66,7 @@ namespace FluentImposter.Core.Tests.Unit
 
             var response = new ResponseBuilder()
                     .WithContent(dummyUserResponseObject, new XmlContentSerializer())
-                    .WithStatusCode(200)
+                    .WithStatusCode(HttpStatusCode.OK)
                     .Build();
 
             var stringBuilder = new StringBuilder();
@@ -91,14 +92,14 @@ namespace FluentImposter.Core.Tests.Unit
         [Fact]
         public void Can_SetResponseStatusCodeUsingResponseBuilder()
         {
-            var statusCode = 200;
+            var statusCode = HttpStatusCode.OK;
 
             var response = new ResponseBuilder()
                     .WithContent("test content")
                     .WithStatusCode(statusCode)
                     .Build();
 
-            response.StatusCode.Should().Be(statusCode);
+            response.StatusCode.Should().Be((int)statusCode);
         }
     }
 }

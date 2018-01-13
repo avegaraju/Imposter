@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 using FluentImposter.AspnetCore.Tests.Integration.Fakes;
 using FluentImposter.AspnetCore.Tests.Integration.Spies;
@@ -75,7 +76,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         {
             return new ResponseBuilder()
                     .WithContent("dummy response")
-                    .WithStatusCode(200)
+                    .WithStatusCode(HttpStatusCode.OK)
                     .Build();
         }
     }

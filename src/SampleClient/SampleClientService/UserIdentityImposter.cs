@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 
@@ -35,7 +36,7 @@ namespace SampleClientService
 
             return new ResponseBuilder()
                     .WithContent(userCreatedResponse, new JsonContentSerializer())
-                    .WithStatusCode(201)
+                    .WithStatusCode(HttpStatusCode.Created)
                     .Build();
         }
     }

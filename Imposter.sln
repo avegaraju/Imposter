@@ -17,7 +17,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.AspnetCore.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentImposter.DataStore.AwsDynamoDb", "src\FluentImposter.DataStore.AwsDynamoDb\FluentImposter.DataStore.AwsDynamoDb.csproj", "{008990E4-4275-4EEB-BD64-6F8215404E12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleClientService", "src\SampleClient\SampleClientService\SampleClientService.csproj", "{032E451D-76F3-47FE-9EB8-DE04971ABB40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleClientService", "src\SampleClient\SampleClientService\SampleClientService.csproj", "{032E451D-76F3-47FE-9EB8-DE04971ABB40}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{08DCA339-17A8-49BC-A47E-0D19C9C335D2}"
+	ProjectSection(SolutionItems) = preProject
+		build.cake = build.cake
+		Build.ps1 = Build.ps1
+		tools\packages.config = tools\packages.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

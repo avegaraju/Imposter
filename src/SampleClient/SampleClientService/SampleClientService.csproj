@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\FluentImposter.AspnetCore\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj" />
+    <ProjectReference Include="..\..\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj" />
   </ItemGroup>
-
 </Project>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Appify.FluentImposter.Core</PackageId>
+    <PackageId>Appify.FluentImposter.AspnetCore</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
     <Authors>Ashish Vegaraju</Authors>
     <owners>Ashish Vegaraju</owners>
@@ -11,19 +11,19 @@
     <PackageIconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <description>Simple over the wire test doubles. This package allows to stub or mock a REST resource.</description>
-    <PackageReleaseNotes>The core funtionality.</PackageReleaseNotes>
+    <PackageReleaseNotes>Aspnet core middleware to spin up rest resources dynamically.</PackageReleaseNotes>
     <copyright>Copyright 2018</copyright>
     <PackageTags>Imposter, FluentImposter, test-doubles, over-the-wire, mocking, aspnetcore, fake, mocking-server</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1-beta3" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Primitives">
-      <HintPath>..\..\packages\Microsoft.Extensions.Primitives.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\FluentImposter.Core\FluentImposter.Core.csproj" />
   </ItemGroup>
 
 </Project>

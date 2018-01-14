@@ -21,6 +21,11 @@ var configuration = Argument<string>("configuration", "Debug");
 var solutions = GetFiles("./**/*.sln");
 var solutionPaths = solutions.Select(solution => solution.GetDirectory());
 
+/////////////////////////////////
+//FOLDER LOCATIONS
+/////////////////////////////////
+var artifactsPath = "artifacts";
+
 /////////////////////////////
 // TASKS
 /////////////////////////////
@@ -61,6 +66,7 @@ Task("Build")
     .Description("Builds all the different parts of the project.")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
+	.IsDependentOn("BuildPackages")
     .Does(() =>
 {
     // Build all solutions.
@@ -111,17 +117,35 @@ Task("Test-Integration")
         }
 });
 
-Task("Build+Test")
+Task("Build+Test+Pack")
     .IsDependentOn("Build")
-    .IsDependentOn("Test");
+    .IsDependentOn("Test")
+	.IsDependentOn("BuildPackages");
 
-///////////////////////////////////////////////////////////////////////////////
-// TARGETS
-///////////////////////////////////////////////////////////////////////////////
+Task("BuildPackages")
+	.Does(() =>
+{
+	if(!DirectoryExists(artifactsPath))
+	{
+		CreateDirectory(artifactsPath);
+	}
+	else
+	{
+		CleanDirectory(artifactsPath);
+	}
 
-Task("Default")
-    .Description("Runs Build and Test.")
-    .IsDependentOn("Build+Test");
+	DotNetCorePack("src/FluentImposter.AspnetCore/FluentImposter.AspnetCore.csproj", new DotNetCorePackSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = artifactsPath
+		});
+
+	DotNetCorePack("src/FluentImposter.Core/FluentImposter.Core.csproj", new DotNetCorePackSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = artifactsPath
+		});
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION

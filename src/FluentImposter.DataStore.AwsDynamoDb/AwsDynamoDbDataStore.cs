@@ -11,11 +11,11 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 {
     public class AwsDynamoDbDataStore: IDataStore
     {
-        private readonly AmazonDynamoDBClient _amazonDynamoDbClient;
+        private readonly IAmazonDynamoDB _client;
 
-        public AwsDynamoDbDataStore()
+        public AwsDynamoDbDataStore(IAmazonDynamoDB client)
         {
-            _amazonDynamoDbClient = new AmazonDynamoDBClient();
+            _client = client;
 
             CreateTables();
         }
@@ -32,7 +32,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                                                                        new AttributeValue(sessionId)
                                                                    }
                                                                });
-            var putItemResponse  = _amazonDynamoDbClient.PutItemAsync(putItemRequest).Result;
+            var putItemResponse  = _client.PutItemAsync(putItemRequest).Result;
 
             return Guid.Parse(sessionId);
         }
@@ -52,7 +52,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
         private bool TablesExists()
         {
-            return _amazonDynamoDbClient.ListTablesAsync(new ListTablesRequest())
+            return _client.ListTablesAsync(new ListTablesRequest())
                                  .Result.TableNames.Any(t => t.Equals("FI_SESSION"));
         }
     }

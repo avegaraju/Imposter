@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 
 using FluentImposter.Core;
+using FluentImposter.DataStore.AwsDynamoDb.Models;
+
+using ServiceStack.Aws.DynamoDb;
 
 namespace FluentImposter.DataStore.AwsDynamoDb
 {
@@ -24,16 +26,6 @@ namespace FluentImposter.DataStore.AwsDynamoDb
         {
             var sessionId = Guid.NewGuid().ToString();
 
-            PutItemRequest putItemRequest = new PutItemRequest("FI_SESSION",
-                                                               new Dictionary<string, AttributeValue>()
-                                                               {
-                                                                   {
-                                                                       "SESSIONID",
-                                                                       new AttributeValue(sessionId)
-                                                                   }
-                                                               });
-            var putItemResponse  = _client.PutItemAsync(putItemRequest).Result;
-
             return Guid.Parse(sessionId);
         }
 
@@ -44,16 +36,10 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
         private void CreateTables()
         {
-            if (!TablesExists())
-            {
-                
-            }
-        }
+            var database = new PocoDynamo(_client)
+                    .RegisterTable<FI_SESSIONS>();
 
-        private bool TablesExists()
-        {
-            return _client.ListTablesAsync(new ListTablesRequest())
-                                 .Result.TableNames.Any(t => t.Equals("FI_SESSION"));
+            database.InitSchema();
         }
     }
 }

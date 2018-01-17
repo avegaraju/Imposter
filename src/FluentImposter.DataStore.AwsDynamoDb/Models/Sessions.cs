@@ -1,10 +1,8 @@
 ﻿using System;
 
-using ServiceStack.DataAnnotations;
-
 namespace FluentImposter.DataStore.AwsDynamoDb.Models
 {
-    public class FI_SESSIONS
+    public class Sessions
     {
         public Guid Id { get; set; }
         public DateTime StartDateTime { get; set; }

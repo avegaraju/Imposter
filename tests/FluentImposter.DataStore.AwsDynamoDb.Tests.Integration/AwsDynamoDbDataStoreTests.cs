@@ -33,7 +33,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
             var dynamo = new PocoDynamo(client);
 
             dynamo.GetTableNames()
-                      .Any(t => t.Equals(nameof(FI_SESSIONS)))
+                      .Any(t => t.Equals(nameof(Sessions)))
                       .Should().BeTrue();
         }
 
@@ -52,8 +52,13 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             var dynamo = new PocoDynamo(client);
 
-            dynamo.GetTableNames()
-                      .Any(t => t.Equals(nameof(FI_SESSIONS)))
+            var tableNames = dynamo.GetTableNames();
+
+            tableNames.Any(t => t.Equals(nameof(Sessions)))
+                      .Should().BeTrue();
+            tableNames.Any(t => t.Equals(nameof(Requests)))
+                      .Should().BeTrue();
+            tableNames.Any(t => t.Equals(nameof(Responses)))
                       .Should().BeTrue();
         }
 
@@ -74,7 +79,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             var dynamo = new PocoDynamo(client);
 
-            dynamo.GetItem<FI_SESSIONS>(sessionId.ToString()).Id
+            dynamo.GetItem<Sessions>(sessionId.ToString()).Id
                       .Should().Be(sessionId);
         }
 
@@ -97,7 +102,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             var dynamo = new PocoDynamo(client);
 
-            var sessionInstance = dynamo.GetItem<FI_SESSIONS>(sessionId.ToString());
+            var sessionInstance = dynamo.GetItem<Sessions>(sessionId.ToString());
 
             sessionInstance.EndDateTime
                            .Should().BeCloseTo(DateTime.Now.ToUniversalTime(), 10000);

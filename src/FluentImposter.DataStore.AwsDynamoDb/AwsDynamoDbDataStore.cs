@@ -18,14 +18,14 @@ namespace FluentImposter.DataStore.AwsDynamoDb
         {
             _dynamo = new PocoDynamo(client);
 
-            CreateTables();
+            InitializeSchema();
         }
 
         public Guid CreateSession()
         {
             var sessionId = Guid.NewGuid();
 
-            _dynamo.PutItem<FI_SESSIONS>(new FI_SESSIONS()
+            _dynamo.PutItem<Sessions>(new Sessions()
                                          {
                                              StartDateTime = DateTime.Now.ToUniversalTime(),
                                              Status = "Active",
@@ -40,7 +40,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
             if (!SessionExists(sessionId))
                 throw new SessionNotFoundException($"No session found with id {sessionId}");
 
-            _dynamo.UpdateItemNonDefaults<FI_SESSIONS>(new FI_SESSIONS()
+            _dynamo.UpdateItemNonDefaults<Sessions>(new Sessions()
                                                        {
                                                            Id = sessionId,
                                                            EndDateTime = DateTime.Now.ToUniversalTime(),
@@ -50,12 +50,14 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
         private bool SessionExists(Guid sessionId)
         {
-            return _dynamo.GetItem<FI_SESSIONS>(sessionId.ToString()) != null;
+            return _dynamo.GetItem<Sessions>(sessionId.ToString()) != null;
         }
 
-        private void CreateTables()
+        private void InitializeSchema()
         {
-            _dynamo.RegisterTable<FI_SESSIONS>();
+            _dynamo.RegisterTable<Sessions>();
+            _dynamo.RegisterTable<Requests>();
+            _dynamo.RegisterTable<Responses>();
 
             _dynamo.InitSchema();
         }

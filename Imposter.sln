@@ -26,6 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		tools\packages.config = tools\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentImposter.DataStore.AwsDynamoDb.Tests.Integration", "tests\FluentImposter.DataStore.AwsDynamoDb.Tests.Integration\FluentImposter.DataStore.AwsDynamoDb.Tests.Integration.csproj", "{015CCBD3-1EFF-4838-A294-57BFD0D2326B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +58,10 @@ Global
 		{032E451D-76F3-47FE-9EB8-DE04971ABB40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{032E451D-76F3-47FE-9EB8-DE04971ABB40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{032E451D-76F3-47FE-9EB8-DE04971ABB40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{015CCBD3-1EFF-4838-A294-57BFD0D2326B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{015CCBD3-1EFF-4838-A294-57BFD0D2326B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{015CCBD3-1EFF-4838-A294-57BFD0D2326B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{015CCBD3-1EFF-4838-A294-57BFD0D2326B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{A40AE757-DC54-497C-A62B-C8DC1616AA33} = {6C6CAF2F-982F-4755-B756-FD3181B85B89}
 		{008990E4-4275-4EEB-BD64-6F8215404E12} = {378E295C-FB89-4011-A0DC-C9E3E1E1C7A7}
 		{032E451D-76F3-47FE-9EB8-DE04971ABB40} = {378E295C-FB89-4011-A0DC-C9E3E1E1C7A7}
+		{015CCBD3-1EFF-4838-A294-57BFD0D2326B} = {6C6CAF2F-982F-4755-B756-FD3181B85B89}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F8BF240-FF57-4BA8-8EA9-1C1C4FA5FB94}

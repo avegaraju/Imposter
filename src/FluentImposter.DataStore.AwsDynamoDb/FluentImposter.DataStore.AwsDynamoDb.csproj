@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.5" />
+    <PackageReference Include="ServiceStack.Aws.Core" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FluentImposter.Core\FluentImposter.Core.csproj" />
   </ItemGroup>
 

@@ -107,6 +107,9 @@ Task("Test-Integration")
     var projects = GetFiles("./**/*Tests.Integration*.csproj");
         foreach(var project in projects)
         {
+            if(project.FullPath.Contains("AwsDynamoDb.Tests.Integration"))
+                continue;
+                
             DotNetCoreTest(
                 project.FullPath,
                 new DotNetCoreTestSettings()

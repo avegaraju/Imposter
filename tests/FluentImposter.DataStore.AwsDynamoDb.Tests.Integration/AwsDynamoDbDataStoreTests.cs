@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net.Http;
 
 using Amazon.DynamoDBv2;
 
@@ -18,7 +19,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 {
     public class AwsDynamoDbDataStoreTests
     {
-        [Fact]
+        [Fact(Skip = "This requires an active aws token.")]
         [Trait("Category","DynamoDb")]
         public void CreatesTables_WhenNoTablesExists_CanCreateSchemaInAmazonAwsDynamoDb()
         {
@@ -26,9 +27,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
             var options = configuration.GetAWSOptions();
 
             var client = options.CreateServiceClient<IAmazonDynamoDB>();
-
-
-            AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
+            new AwsDynamoDbDataStore(client);
 
             var dynamo = new PocoDynamo(client);
 
@@ -41,16 +40,11 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         [Trait("Category", "DynamoDb")]
         public void CreatesTables_WhenNoTablesExists_CanCreateSchemaInLocalDynamoDbInstance()
         {
-            var config = new AmazonDynamoDBConfig
-                         {
-                             ServiceURL = "http://localhost:8000"
-                         };
+            AwsDynamoDbDataStore sut = CreateSut();
 
-            var client = new AmazonDynamoDBClient(config);
+            sut.CreateSession();
 
-            AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
-
-            var dynamo = new PocoDynamo(client);
+            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
 
             var tableNames = dynamo.GetTableNames();
 
@@ -66,18 +60,12 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         [Trait("Category", "DynamoDb")]
         public void CreateSession_CanCreateASession()
         {
-            var config = new AmazonDynamoDBConfig
-                         {
-                             ServiceURL = "http://localhost:8000"
-                         };
+            AwsDynamoDbDataStore sut = CreateSut();
 
-            var client = new AmazonDynamoDBClient(config);
+            var sessionId = sut.CreateSession();
 
-            AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
 
-            var sessionId = awsDynamoDbDataStore.CreateSession();
-
-            var dynamo = new PocoDynamo(client);
+            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
 
             dynamo.GetItem<Sessions>(sessionId.ToString()).Id
                       .Should().Be(sessionId);
@@ -87,20 +75,13 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         [Trait("Category", "DynamoDb")]
         public void EndSession_CanEndASession()
         {
-            var config = new AmazonDynamoDBConfig
-                         {
-                             ServiceURL = "http://localhost:8000"
-                         };
+            AwsDynamoDbDataStore sut = CreateSut();
 
-            var client = new AmazonDynamoDBClient(config);
+            var sessionId = sut.CreateSession();
 
-            AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
+            sut.EndSession(sessionId);
 
-            var sessionId = awsDynamoDbDataStore.CreateSession();
-
-            awsDynamoDbDataStore.EndSession(sessionId);
-
-            var dynamo = new PocoDynamo(client);
+            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
 
             var sessionInstance = dynamo.GetItem<Sessions>(sessionId.ToString());
 
@@ -114,20 +95,59 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         [Trait("Category", "DynamoDb")]
         public void EndSession_WithIncorrectSessionId_ThrowsSessionNotFoundException()
         {
-            var config = new AmazonDynamoDBConfig
-                         {
-                             ServiceURL = "http://localhost:8000"
-                         };
+            AwsDynamoDbDataStore sut = CreateSut();
 
-            var client = new AmazonDynamoDBClient(config);
+            sut.CreateSession();
 
-            AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
-
-            var sessionId = awsDynamoDbDataStore.CreateSession();
-
-            Action exceptionAction = () => awsDynamoDbDataStore.EndSession(Guid.NewGuid());
+            Action exceptionAction = () => sut.EndSession(Guid.NewGuid());
 
             exceptionAction.Should().Throw<SessionNotFoundException>();
+        }
+
+        [Fact]
+        [Trait("Category", "DynamoDb")]
+        public void StoreRequest_WithNonExistingSessionId_ThrowsException()
+        {
+            Action exceptionThrowingAction
+                    = () => CreateSut()
+                              .StoreRequest(Guid.NewGuid(), "/", HttpMethod.Post, null);
+
+            exceptionThrowingAction.Should().Throw<SessionNotFoundException>();
+        }
+
+        [Fact]
+        [Trait("Category", "DynamoDb")]
+        public void StoreRequest_WithAnAlreadyCompletedSessionId_ThrowsException()
+        {
+            var sut = CreateSut();
+
+            var sessionId = sut.CreateSession();
+            sut.EndSession(sessionId);
+
+            Action exceptionThrowingAction
+                    = () => sut
+                              .StoreRequest(sessionId, "/", HttpMethod.Post, null);
+
+            exceptionThrowingAction.Should().Throw<SessionNoLongerActiveException>();
+        }
+
+        private static AwsDynamoDbDataStore CreateSut()
+        {
+            AmazonDynamoDBClient client = GetAmazonDynamoDbClient();
+
+            AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
+            return awsDynamoDbDataStore;
+        }
+
+        private static AmazonDynamoDBClient GetAmazonDynamoDbClient()
+        {
+            var config = new AmazonDynamoDBConfig
+            {
+                ServiceURL = "http://localhost:8000"
+            };
+
+            var client = new AmazonDynamoDBClient(config);
+            return client;
         }
 
         private IConfiguration LoadConfiguration()

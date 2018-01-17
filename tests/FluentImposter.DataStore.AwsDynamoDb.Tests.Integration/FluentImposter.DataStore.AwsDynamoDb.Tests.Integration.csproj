@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\FluentImposter.Core\FluentImposter.Core.csproj" />
     <ProjectReference Include="..\..\src\FluentImposter.DataStore.AwsDynamoDb\FluentImposter.DataStore.AwsDynamoDb.csproj" />
   </ItemGroup>
 

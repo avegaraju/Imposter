@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
 
 using FluentImposter.Core;
+using FluentImposter.Core.Exceptions;
 using FluentImposter.DataStore.AwsDynamoDb.Models;
 
 using ServiceStack.Aws.DynamoDb;
@@ -13,33 +12,52 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 {
     public class AwsDynamoDbDataStore: IDataStore
     {
-        private readonly IAmazonDynamoDB _client;
+        private readonly PocoDynamo _dynamo;
 
         public AwsDynamoDbDataStore(IAmazonDynamoDB client)
         {
-            _client = client;
+            _dynamo = new PocoDynamo(client);
 
             CreateTables();
         }
 
         public Guid CreateSession()
         {
-            var sessionId = Guid.NewGuid().ToString();
+            var sessionId = Guid.NewGuid();
 
-            return Guid.Parse(sessionId);
+            _dynamo.PutItem<FI_SESSIONS>(new FI_SESSIONS()
+                                         {
+                                             StartDateTime = DateTime.Now.ToUniversalTime(),
+                                             Status = "Active",
+                                             Id = sessionId
+                                         });
+
+            return sessionId;
         }
 
-        public void EndSession(Guid guid)
+        public void EndSession(Guid sessionId)
         {
-            throw new NotImplementedException();
+            if (!SessionExists(sessionId))
+                throw new SessionNotFoundException($"No session found with id {sessionId}");
+
+            _dynamo.UpdateItemNonDefaults<FI_SESSIONS>(new FI_SESSIONS()
+                                                       {
+                                                           Id = sessionId,
+                                                           EndDateTime = DateTime.Now.ToUniversalTime(),
+                                                           Status = "Completed"
+                                                       });
+        }
+
+        private bool SessionExists(Guid sessionId)
+        {
+            return _dynamo.GetItem<FI_SESSIONS>(sessionId.ToString()) != null;
         }
 
         private void CreateTables()
         {
-            var database = new PocoDynamo(_client)
-                    .RegisterTable<FI_SESSIONS>();
+            _dynamo.RegisterTable<FI_SESSIONS>();
 
-            database.InitSchema();
+            _dynamo.InitSchema();
         }
     }
 }

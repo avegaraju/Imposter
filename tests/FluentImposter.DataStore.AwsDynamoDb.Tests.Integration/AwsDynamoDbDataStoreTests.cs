@@ -88,7 +88,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
             sessionInstance.EndDateTime
                            .Should().BeCloseTo(DateTime.Now.ToUniversalTime(), 10000);
             sessionInstance.Status
-                           .Should().Be("Completed");
+                           .Should().Be(SessionStatus.Completed.ToString());
         }
 
         [Fact]
@@ -128,7 +128,8 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
                     = () => sut
                               .StoreRequest(sessionId, "/", HttpMethod.Post, null);
 
-            exceptionThrowingAction.Should().Throw<SessionNoLongerActiveException>();
+            exceptionThrowingAction
+                .Should().Throw<SessionNoLongerActiveException>();
         }
 
         private static AwsDynamoDbDataStore CreateSut()

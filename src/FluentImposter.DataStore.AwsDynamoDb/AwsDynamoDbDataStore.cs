@@ -29,7 +29,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
             _dynamo.PutItem(new Sessions()
                             {
                                 StartDateTime = DateTime.Now.ToUniversalTime(),
-                                Status = "Active",
+                                Status = SessionStatus.Active.ToString(),
                                 Id = sessionId
                             });
 
@@ -45,7 +45,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                                           {
                                               Id = sessionId,
                                               EndDateTime = DateTime.Now.ToUniversalTime(),
-                                              Status = "Completed"
+                                              Status = SessionStatus.Completed.ToString()
                                           });
         }
 
@@ -86,7 +86,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
         private bool SessionAlreadyCompleted(Guid sessionId)
         {
             return _dynamo.GetItem<Sessions>(sessionId.ToString())
-                          .Status.Equals("Completed");
+                          .Status.Equals(SessionStatus.Completed.ToString());
         }
 
         private void InitializeSchema()
@@ -97,5 +97,11 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
             _dynamo.InitSchema();
         }
+    }
+
+    public enum SessionStatus
+    {
+        Completed,
+        Active
     }
 }

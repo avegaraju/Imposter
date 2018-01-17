@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
-using System.Text;
 
 using Amazon.DynamoDBv2;
 
 using FluentAssertions;
 
+using FluentImposter.Core.Entities;
 using FluentImposter.Core.Exceptions;
 using FluentImposter.DataStore.AwsDynamoDb.Models;
 
@@ -160,6 +161,44 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
                    .Should().Be(sessionId);
             request.RequestPayloadBase64
                    .Should().Be("test".ToAsciiBytes().ToBase64String());
+        }
+
+        [Fact]
+        public void StoreResponse_WithIncorrectRequestId_ThrowsException()
+        {
+            var sut = CreateSut();
+
+            Action exceptionThrowingAction
+                    = () => sut.StoreResponse(Guid.NewGuid(), "test", "condition expression", null);
+
+            exceptionThrowingAction
+                    .Should().Throw<RequestDoesNotExistException>();
+        }
+
+        [Fact]
+        public void StoreResponse_WithValidRequestId_StoresResponse()
+        {
+            var sut = CreateSut();
+
+            var sessionId = sut.CreateSession();
+            var requestId = sut.StoreRequest(sessionId, "/test", HttpMethod.Get, "test".ToAsciiBytes());
+
+            Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
+
+            var responseId = sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
+
+            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+
+            var response = dynamo.GetItem<Responses>(responseId.ToString());
+
+            response.ImposterName
+                    .Should().Be("test");
+            response.RequestId
+                    .Should().Be(requestId);
+            response.ResponsePayloadBase64
+                    .Should().Be("test".ToAsciiBytes().ToBase64String());
+            response.MatchedCondition
+                    .Should().Be(expr.ToString());
         }
 
         private static AwsDynamoDbDataStore CreateSut()

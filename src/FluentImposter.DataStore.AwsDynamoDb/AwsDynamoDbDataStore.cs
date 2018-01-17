@@ -76,7 +76,25 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
         public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
         {
-            throw new NotImplementedException();
+            if(!RequestExists(requestId))
+                throw new RequestDoesNotExistException($"Request with id {requestId} does not exist.");
+
+            var responseId = Guid.NewGuid();
+            _dynamo.PutItem(new Responses()
+                            {
+                                Id = responseId,
+                                ImposterName = imposterName,
+                                MatchedCondition = matchedCondition,
+                                RequestId = requestId,
+                                ResponsePayloadBase64 = Convert.ToBase64String(responsePayload)
+                            });
+
+            return responseId;
+        }
+
+        private bool RequestExists(Guid requestId)
+        {
+            return _dynamo.GetItem<Requests>(requestId.ToString()) != null;
         }
 
         private bool SessionExists(Guid sessionId)

@@ -8,6 +8,6 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Models
         public Guid SessionId { get; set; }
         public string Resource { get; set; }
         public string HttpMethod { get; set; }
-        public byte[] RequestPayload { get; set; }
+        public string RequestPayloadBase64 { get; set; }
     }
 }

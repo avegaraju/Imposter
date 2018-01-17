@@ -67,7 +67,8 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                                 HttpMethod = method.ToString(),
                                 Id = requestId,
                                 Resource = resource,
-                                RequestPayload = requestPayload
+                                RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
+                                SessionId = sessionId
                             });
 
             return requestId;

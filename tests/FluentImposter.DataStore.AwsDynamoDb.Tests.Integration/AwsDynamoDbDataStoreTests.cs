@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 
 using Amazon.DynamoDBv2;
 
@@ -11,7 +12,9 @@ using FluentImposter.DataStore.AwsDynamoDb.Models;
 
 using Microsoft.Extensions.Configuration;
 
+using ServiceStack;
 using ServiceStack.Aws.DynamoDb;
+using ServiceStack.Aws.Support;
 
 using Xunit;
 
@@ -130,6 +133,33 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             exceptionThrowingAction
                 .Should().Throw<SessionNoLongerActiveException>();
+        }
+
+        [Fact]
+        [Trait("Category", "DynamoDb")]
+        public void StoreRequest_WithAnActiveSessionId_StoresTheRequest()
+        {
+            var sut = CreateSut();
+
+            var sessionId = sut.CreateSession();
+
+            var requestId = sut.StoreRequest(sessionId,
+                                             "/test",
+                                             HttpMethod.Post,
+                                             "test".ToAsciiBytes());
+
+            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+
+            var request = dynamo.GetItem<Requests>(requestId.ToString());
+
+            request.HttpMethod
+                   .Should().Be(HttpMethod.Post.ToString());
+            request.Resource
+                   .Should().Be("/test");
+            request.SessionId
+                   .Should().Be(sessionId);
+            request.RequestPayloadBase64
+                   .Should().Be("test".ToAsciiBytes().ToBase64String());
         }
 
         private static AwsDynamoDbDataStore CreateSut()

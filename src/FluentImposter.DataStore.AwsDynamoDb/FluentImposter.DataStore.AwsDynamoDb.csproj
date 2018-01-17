@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Appify.FluentImposter.DataStore.AwsDynamoDb</PackageId>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>Ashish Vegaraju</Authors>
+    <owners>Ashish Vegaraju</owners>
+    <PackageLicenseUrl>https://github.com/avegaraju/Imposter/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/avegaraju/Imposter</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <description>Simple over the wire test doubles. This package allows to stub or mock a REST resource.</description>
+    <PackageReleaseNotes>Enables to store mocking sessions in Amazon Aws DynamoDb for request/response verification.</PackageReleaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <PackageTags>Imposter, FluentImposter, test-doubles, over-the-wire, mocking, aspnetcore, fake, mocking-server</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace FluentImposter.Core
 {
@@ -7,5 +7,15 @@ namespace FluentImposter.Core
     {
         Guid CreateSession();
         void EndSession(Guid guid);
+
+        Guid StoreRequest(Guid sessionId,
+                                string resource,
+                                HttpMethod method,
+                                byte[] requestPayload);
+
+        Guid StoreResponse(Guid requestId,
+                               string imposterName,
+                               string matchedCondition,
+                               byte[] responsePayload);
     }
 }

@@ -123,31 +123,37 @@ Task("Test-Integration")
 Task("Build+Test+Pack")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-	.IsDependentOn("BuildPackages");
+    .IsDependentOn("BuildPackages");
 
 Task("BuildPackages")
-	.Does(() =>
+    .Does(() =>
 {
-	if(!DirectoryExists(artifactsPath))
-	{
-		CreateDirectory(artifactsPath);
-	}
-	else
-	{
-		CleanDirectory(artifactsPath);
-	}
+    if(!DirectoryExists(artifactsPath))
+    {
+        CreateDirectory(artifactsPath);
+    }
+    else
+    {
+        CleanDirectory(artifactsPath);
+    }
 
-	DotNetCorePack("src/FluentImposter.AspnetCore/FluentImposter.AspnetCore.csproj", new DotNetCorePackSettings
+    DotNetCorePack("src/FluentImposter.AspnetCore/FluentImposter.AspnetCore.csproj", new DotNetCorePackSettings
         {
             Configuration = configuration,
             OutputDirectory = artifactsPath
-		});
+        });
 
-	DotNetCorePack("src/FluentImposter.Core/FluentImposter.Core.csproj", new DotNetCorePackSettings
+    DotNetCorePack("src/FluentImposter.Core/FluentImposter.Core.csproj", new DotNetCorePackSettings
         {
             Configuration = configuration,
             OutputDirectory = artifactsPath
-		});
+        });
+
+    DotNetCorePack("src/FluentImposter.DataStore.AwsDynamoDb/FluentImposter.DataStore.AwsDynamoDb.csproj", new DotNetCorePackSettings
+        {
+            Configuration = configuration,
+            OutputDirectory = artifactsPath
+        });
 });
 
 ///////////////////////////////////////////////////////////////////////////////

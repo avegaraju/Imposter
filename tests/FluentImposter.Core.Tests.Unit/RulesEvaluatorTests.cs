@@ -30,7 +30,7 @@ namespace FluentImposter.Core.Tests.Unit
                     .WithRequestContent("test content")
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR);
             response.Content.Should().Be(responseContent);
@@ -54,7 +54,7 @@ namespace FluentImposter.Core.Tests.Unit
             var request = new RequestBuilder()
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR);
             response.Content.Should().Be(responseContent);
@@ -75,7 +75,7 @@ namespace FluentImposter.Core.Tests.Unit
             var request = new RequestBuilder()
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(INTERNAL_SERVER_ERROR);
             response.Content.Should().Be(responseContent);
@@ -97,7 +97,7 @@ namespace FluentImposter.Core.Tests.Unit
                     .WithRequestContent(requestContent)
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(STATUS_CODE_OK);
             response.Content.Should().Be(responseContent);
@@ -125,7 +125,7 @@ namespace FluentImposter.Core.Tests.Unit
                     .WithRequestHeader(headerKey, headerValues)
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(STATUS_CODE_OK);
             response.Content.Should().Be(responseContent);
@@ -157,7 +157,7 @@ namespace FluentImposter.Core.Tests.Unit
                     .WithRequestContent("dummy request")
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(STATUS_CODE_OK);
             response.Content.Should().Be(responseContent);
@@ -189,7 +189,7 @@ namespace FluentImposter.Core.Tests.Unit
                     .WithRequestContent("dummy request")
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(STATUS_CODE_OK);
             response.Content.Should().Be(responseContent);
@@ -221,7 +221,7 @@ namespace FluentImposter.Core.Tests.Unit
                     .WithRequestContent(requestContent)
                     .Build();
 
-            var response = RulesEvaluator.Evaluate(imposter, request);
+            var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
             response.StatusCode.Should().Be(STATUS_CODE_OK);
             response.Content.Should().Be(responseContent);

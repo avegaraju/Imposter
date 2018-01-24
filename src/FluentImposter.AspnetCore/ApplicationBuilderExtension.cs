@@ -55,16 +55,16 @@ namespace FluentImposter.AspnetCore
             RequestDelegate CreateMockingSessionRequestHandler()
             {
                 return async context =>
-                       {
-                           if (_dataStore != null)
-                           {
-                               await CreateNewMockingSession(context);
-                           }
-                           else
-                           {
-                               await ReturnErrorResponse(context);
-                           }
-                       };
+                {
+                    if (DataStoreIsConfigured())
+                    {
+                        await CreateNewMockingSession(context);
+                    }
+                    else
+                    {
+                        await ReturnErrorResponse(context);
+                    }
+                };
             }
 
             async Task CreateNewMockingSession(HttpContext context)
@@ -85,6 +85,11 @@ namespace FluentImposter.AspnetCore
                         (int)HttpStatusCode.InternalServerError;
                 await context.Response.WriteAsync("No data store configured to enable mocking.");
             }
+        }
+
+        private static bool DataStoreIsConfigured()
+        {
+            return !(_dataStore is NullDataStore);
         }
 
         private static bool ActiveSessionExists()
@@ -119,19 +124,18 @@ namespace FluentImposter.AspnetCore
             {
                 var request = BuildRequest(context);
 
-                //ToDo: This needs to be improved.
-                var requestId = _dataStore?.StoreRequest(_currentSession,
-                                                         imposter.Resource,
-                                                         imposter.Method,
-                                                         Encoding.ASCII.GetBytes(request.Content));
+                var requestId = _dataStore.StoreRequest(_currentSession,
+                                                        imposter.Resource,
+                                                        imposter.Method,
+                                                        Encoding.ASCII.GetBytes(request.Content));
 
-                var response = RulesEvaluator.Evaluate(imposter, request, out Expression<Func<Request,bool>> condition);
+                var response =
+                        RulesEvaluator.Evaluate(imposter, request, out Expression<Func<Request, bool>> condition);
 
-                //ToDo: This needs to be improved.
-                _dataStore?.StoreResponse(requestId ?? Guid.Empty,
-                                          imposter.Name,
-                                          condition?.ToString(),
-                                          Encoding.ASCII.GetBytes(response.Content));
+                _dataStore.StoreResponse(requestId,
+                                         imposter.Name,
+                                         condition?.ToString(),
+                                         Encoding.ASCII.GetBytes(response.Content));
 
                 context.Response.StatusCode = response.StatusCode;
                 await context.Response.WriteAsync(response.Content);

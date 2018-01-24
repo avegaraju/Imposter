@@ -21,7 +21,7 @@ namespace SampleClientService
                                                                   {
                                                                       userIdentityImposter
                                                                   });
-
+            
             app.UseImposters(imposterConfiguration);
         }
     }

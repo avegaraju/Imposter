@@ -475,5 +475,30 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                     .GetString(spyDataStore.ResponsePayload).Should().Be("dummy response");
             }
         }
+
+        [Fact]
+        public async void Middleware_WhenDataStoreIsNotConfigured_ReturnsResponseWithoutAnyErrors()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("test")
+                                       .And(message =>
+                                            {
+                                                message.Content = new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                response.Content
+                        .ReadAsStringAsync().Result.Should().Be("dummy response");
+            }
+        }
     }
 }

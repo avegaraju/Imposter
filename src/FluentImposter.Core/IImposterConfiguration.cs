@@ -5,7 +5,7 @@ namespace FluentImposter.Core
     public class ImposterConfiguration
     {
         public Imposter[] Imposters { get; private set; }
-        internal IDataStore DataStore { get; private set; }
+        internal IDataStore DataStore { get; private set; } = new NullDataStore();
 
         public ImposterConfiguration(Imposter[] imposters)
         {

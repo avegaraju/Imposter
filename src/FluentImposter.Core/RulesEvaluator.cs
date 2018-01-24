@@ -1,10 +1,13 @@
-﻿using FluentImposter.Core.Entities;
+﻿using System;
+using System.Linq.Expressions;
+
+using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {
     internal static class RulesEvaluator
     {
-        public static Response Evaluate(Imposter imposter, Request request)
+        public static Response Evaluate(Imposter imposter, Request request, out Expression<Func<Request, bool>> outCondition)
         {
             foreach (var imposterRule in imposter.Rules)
             {
@@ -12,10 +15,12 @@ namespace FluentImposter.Core
 
                 if (condition(request))
                 {
+                    outCondition = imposterRule.Condition;
                     return imposterRule.ResponseCreatorAction.CreateResponse();
                 }
             }
 
+            outCondition = null;
             return CreateInternalServerErrorResponse();
         }
 

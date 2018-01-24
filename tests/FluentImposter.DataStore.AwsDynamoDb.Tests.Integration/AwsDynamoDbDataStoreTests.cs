@@ -48,7 +48,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             sut.CreateSession();
 
-            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
             var tableNames = dynamo.GetTableNames();
 
@@ -69,7 +69,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
             var sessionId = sut.CreateSession();
 
 
-            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
             dynamo.GetItem<Sessions>(sessionId.ToString()).Id
                       .Should().Be(sessionId);
@@ -85,7 +85,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             sut.EndSession(sessionId);
 
-            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
             var sessionInstance = dynamo.GetItem<Sessions>(sessionId.ToString());
 
@@ -149,7 +149,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
                                              HttpMethod.Post,
                                              "test".ToAsciiBytes());
 
-            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
             var request = dynamo.GetItem<Requests>(requestId.ToString());
 
@@ -187,7 +187,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             var responseId = sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
 
-            var dynamo = new PocoDynamo(GetAmazonDynamoDbClient());
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
             var response = dynamo.GetItem<Responses>(responseId.ToString());
 
@@ -203,13 +203,13 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
         private static AwsDynamoDbDataStore CreateSut()
         {
-            AmazonDynamoDBClient client = GetAmazonDynamoDbClient();
+            AmazonDynamoDBClient client = CreateAmazonDynamoDbClientWithLocalDbInstance();
 
             AwsDynamoDbDataStore awsDynamoDbDataStore = new AwsDynamoDbDataStore(client);
             return awsDynamoDbDataStore;
         }
 
-        private static AmazonDynamoDBClient GetAmazonDynamoDbClient()
+        private static AmazonDynamoDBClient CreateAmazonDynamoDbClientWithLocalDbInstance()
         {
             var config = new AmazonDynamoDBConfig
             {

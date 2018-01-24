@@ -8,7 +8,17 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
     public class SpyDataStore: IDataStore
     {
         public Guid NewSessionId { get; private set; } 
-        public bool MockSessionStatusEnded { get; private set; }
+        public Guid EndedSessionId { get; private set; }
+        public Guid SessionIdReceivedWithRequest { get; private set; }
+        public Guid NewRequestId { get; set; }
+        public string RequestedResource { get; set; }
+        public string HttpMethod { get; set; }
+        public byte[] RequestPayload { get; set; }
+        public Guid NewResponseId { get; set; }
+        public Guid RequestIdReceivedWhileStoringResponse { get; set; }
+        public string MatchedCondition { get; set; }
+        public string ImposterName { get; set; }
+        public byte[] ResponsePayload { get; set; }
 
         public SpyDataStore()
         {
@@ -24,17 +34,28 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
 
         public void EndSession(Guid guid)
         {
-            MockSessionStatusEnded = true;
+            EndedSessionId = guid;
         }
 
         public Guid StoreRequest(Guid sessionId, string resource, HttpMethod method, byte[] requestPayload)
         {
-            throw new NotImplementedException();
+            SessionIdReceivedWithRequest = sessionId;
+            RequestedResource = resource;
+            HttpMethod = method.ToString();
+            RequestPayload = requestPayload;
+
+            return NewRequestId = Guid.NewGuid();
         }
 
         public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
         {
-            throw new NotImplementedException();
+            RequestIdReceivedWhileStoringResponse = requestId;
+
+            MatchedCondition = matchedCondition;
+            ImposterName = imposterName;
+            ResponsePayload = responsePayload;
+
+            return NewResponseId = Guid.NewGuid();
         }
     }
 }

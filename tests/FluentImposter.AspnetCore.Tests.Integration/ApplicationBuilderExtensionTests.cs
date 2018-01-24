@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 
 using FluentAssertions;
 
 using FluentImposter.AspnetCore.Tests.Integration.Fakes;
 using FluentImposter.AspnetCore.Tests.Integration.Spies;
+using FluentImposter.Core.Entities;
 
 using Xunit;
 
@@ -17,7 +20,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public async void Middleware_ImposterReceivesRequestWithMatchingContent_ReturnsPreDefinedResponse()
         {
             using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent(HttpMethod.Get).Build())
                     .Build())
             {
                 var response = await testServer
@@ -87,7 +90,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent().Build(),
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Get).Build(),
                                                              spyDataStore)
                     .Build())
             {
@@ -108,11 +111,12 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         }
 
         [Fact]
-        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WithoutADataStore_ReturnsInternalServerError()
+        public async void
+                Middleware_ImposterReceivesMockSessionCreationRequest_WithoutADataStore_ReturnsInternalServerError()
         {
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent().Build())
+                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent(HttpMethod.Post).Build())
                     .Build())
             {
                 var response = await testServer
@@ -132,13 +136,15 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         }
 
         [Fact]
-        public async void Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsPost_ReturnsCreatedWithValidSession()
+        public async void
+                Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsPost_ReturnsCreatedWithValidSession()
         {
             var spyDataStore = new SpyDataStore();
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent().Build(),
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
                                                              spyDataStore)
                     .Build())
             {
@@ -155,7 +161,318 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                         .Should().Be(HttpStatusCode.Created);
 
                 spyDataStore.NewSessionId
-                    .Should().Be(response.Content.ReadAsStringAsync().Result);
+                            .Should().Be(response.Content.ReadAsStringAsync().Result);
+            }
+        }
+
+        [Fact]
+        public async void
+                Middleware_ImposterReceivesMockSessionCreationRequest_AndTheExistingSessionIsStillActive_EndsThePreviousSession()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                var firstSessionId = spyDataStore.NewSessionId;
+
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                spyDataStore.EndedSessionId.Should().Be(firstSessionId);
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_RequestWillHaveAnActiveSessionId()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var sessionResponse = await testServer
+                                              .CreateRequest("/mocks/session")
+                                              .And(message =>
+                                                   {
+                                                       message.Content =
+                                                               new StringContent("dummy request");
+                                                   })
+                                              .PostAsync();
+
+                var activeSessionId = sessionResponse.Content.ReadAsStringAsync().Result;
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                spyDataStore.SessionIdReceivedWithRequest.Should().Be(activeSessionId);
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_CorrectResourceStringIsReceivedByTheDataStore()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                spyDataStore.RequestedResource.Should().Be("test");
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_CorrectHtpMethodIsReceivedByTheDataStore()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var sessionResponse = await testServer
+                                              .CreateRequest("/mocks/session")
+                                              .And(message =>
+                                                   {
+                                                       message.Content =
+                                                               new StringContent("dummy request");
+                                                   })
+                                              .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                spyDataStore.HttpMethod.Should().Be(HttpMethod.Post.ToString());
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_CorrectRequestPayloadIsReceivedByTheDataStore()
+        {
+            var requestContent = "dummy request";
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent(requestContent);
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                Encoding.ASCII.GetString(spyDataStore.RequestPayload)
+                        .Should().Be(requestContent);
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_EachResponseWillHaveARequestId()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                spyDataStore.RequestIdReceivedWhileStoringResponse
+                            .Should().Be(spyDataStore.NewRequestId);
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_CorrectResponseConditionIsReceivedByTheDataStore()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                Expression<Func<Request, bool>> condition = r => r.Content.Contains("dummy");
+
+                spyDataStore.MatchedCondition
+                            .Should().Be(condition.ToString());
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_CorrectImposterNameIsReceivedByTheDataStore()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                spyDataStore.ImposterName
+                            .Should().Be("test");
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_CorrectResponsePayloadIsReceivedByTheDataStore()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                Encoding.ASCII
+                    .GetString(spyDataStore.ResponsePayload).Should().Be("dummy response");
             }
         }
     }

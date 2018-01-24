@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 using FluentImposter.Core;
@@ -16,6 +19,7 @@ namespace FluentImposter.AspnetCore
     public static class ApplicationBuilderExtension
     {
         private static IDataStore _dataStore;
+        private static Guid _currentSession = Guid.Empty;
 
         public static void UseImposters(this IApplicationBuilder applicationBuilder,
                                         ImposterConfiguration imposterConfiguration)
@@ -65,11 +69,14 @@ namespace FluentImposter.AspnetCore
 
             async Task CreateNewMockingSession(HttpContext context)
             {
-                var sessionId = _dataStore.CreateSession();
+                if (ActiveSessionExists())
+                    _dataStore.EndSession(_currentSession);
+
+                _currentSession = _dataStore.CreateSession();
 
                 context.Response.StatusCode =
                         (int)HttpStatusCode.Created;
-                await context.Response.WriteAsync(sessionId.ToString());
+                await context.Response.WriteAsync(_currentSession.ToString());
             }
 
             async Task ReturnErrorResponse(HttpContext context)
@@ -78,6 +85,11 @@ namespace FluentImposter.AspnetCore
                         (int)HttpStatusCode.InternalServerError;
                 await context.Response.WriteAsync("No data store configured to enable mocking.");
             }
+        }
+
+        private static bool ActiveSessionExists()
+        {
+            return _currentSession != Guid.Empty;
         }
 
         private static void CreateRoutesForImposterResources(Imposter[] imposters,
@@ -107,7 +119,19 @@ namespace FluentImposter.AspnetCore
             {
                 var request = BuildRequest(context);
 
-                var response = RulesEvaluator.Evaluate(imposter, request);
+                //ToDo: This needs to be improved.
+                var requestId = _dataStore?.StoreRequest(_currentSession,
+                                                         imposter.Resource,
+                                                         imposter.Method,
+                                                         Encoding.ASCII.GetBytes(request.Content));
+
+                var response = RulesEvaluator.Evaluate(imposter, request, out Expression<Func<Request,bool>> condition);
+
+                //ToDo: This needs to be improved.
+                _dataStore?.StoreResponse(requestId ?? Guid.Empty,
+                                          imposter.Name,
+                                          condition?.ToString(),
+                                          Encoding.ASCII.GetBytes(response.Content));
 
                 context.Response.StatusCode = response.StatusCode;
                 await context.Response.WriteAsync(response.Content);
@@ -122,7 +146,8 @@ namespace FluentImposter.AspnetCore
                 var request = new Request()
                 {
                     Content = streamReader.ReadToEnd(),
-                    RequestHeader = BuildRequestHeader()
+                    RequestHeader = BuildRequestHeader(),
+                    SessionId = _currentSession
                 };
 
                 return request;

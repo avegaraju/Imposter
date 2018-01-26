@@ -124,22 +124,40 @@ namespace FluentImposter.AspnetCore
             {
                 var request = BuildRequest(context);
 
-                var requestId = _dataStore.StoreRequest(_currentSession,
-                                                        imposter.Resource,
-                                                        imposter.Method,
-                                                        Encoding.ASCII.GetBytes(request.Content));
-
                 var response =
-                        RulesEvaluator.Evaluate(imposter, request, out Expression<Func<Request, bool>> condition);
+                        RulesEvaluator.Evaluate(imposter,
+                                                request,
+                                                out Expression<Func<Request, bool>> matchedCondition);
 
-                _dataStore.StoreResponse(requestId,
-                                         imposter.Name,
-                                         condition?.ToString(),
-                                         Encoding.ASCII.GetBytes(response.Content));
+                StoreRequestAndResponse(imposter, request, response, matchedCondition);
 
                 context.Response.StatusCode = response.StatusCode;
                 await context.Response.WriteAsync(response.Content);
             }
+        }
+
+        private static void StoreRequestAndResponse(Imposter imposter,
+                                                    Request request,
+                                                    Response response,
+                                                    Expression<Func<Request, bool>> matchedCondition)
+        {
+            if (!MockingEnabled(imposter))
+                return;
+
+            var requestId = _dataStore.StoreRequest(_currentSession,
+                                                    imposter.Resource,
+                                                    imposter.Method,
+                                                    Encoding.ASCII.GetBytes(request.Content));
+
+            _dataStore.StoreResponse(requestId,
+                                     imposter.Name,
+                                     matchedCondition?.ToString(),
+                                     Encoding.ASCII.GetBytes(response.Content));
+        }
+
+        private static bool MockingEnabled(Imposter imposter)
+        {
+            return imposter.Behavior == ImposterBehavior.Mock;
         }
 
         private static Request BuildRequest(HttpContext context)

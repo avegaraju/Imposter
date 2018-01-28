@@ -4,8 +4,9 @@ using System.Net.Http;
 using Amazon.DynamoDBv2;
 
 using FluentImposter.Core;
+using FluentImposter.Core.Entities;
 using FluentImposter.Core.Exceptions;
-using FluentImposter.DataStore.AwsDynamoDb.Models;
+using FluentImposter.Core.Models;
 
 using ServiceStack.Aws.DynamoDb;
 
@@ -90,6 +91,11 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                             });
 
             return responseId;
+        }
+
+        public VerificationResponse GetVerificationResponse(Guid sessionId, string resource)
+        {
+            _dynamo.GetItem<Requests>()
         }
 
         private bool RequestExists(Guid requestId)

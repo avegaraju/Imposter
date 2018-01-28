@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentImposter.DataStore.AwsDynamoDb.Models
+namespace FluentImposter.Core.Models
 {
     public class Requests
     {

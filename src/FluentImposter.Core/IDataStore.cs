@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 
+using FluentImposter.Core.Entities;
+
 namespace FluentImposter.Core
 {
     public interface IDataStore
@@ -17,5 +19,7 @@ namespace FluentImposter.Core
                                string imposterName,
                                string matchedCondition,
                                byte[] responsePayload);
+
+        VerificationResponse GetVerificationResponse(Guid sessionId, string resource);
     }
 }

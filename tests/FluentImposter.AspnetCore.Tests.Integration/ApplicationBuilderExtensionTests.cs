@@ -10,6 +10,8 @@ using FluentImposter.AspnetCore.Tests.Integration.Fakes;
 using FluentImposter.AspnetCore.Tests.Integration.Spies;
 using FluentImposter.Core.Entities;
 
+using Newtonsoft.Json;
+
 using Xunit;
 
 namespace FluentImposter.AspnetCore.Tests.Integration
@@ -472,7 +474,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                         .PostAsync();
 
                 Encoding.ASCII
-                    .GetString(spyDataStore.ResponsePayload).Should().Be("dummy response");
+                        .GetString(spyDataStore.ResponsePayload).Should().Be("dummy response");
             }
         }
 
@@ -498,6 +500,100 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
                 response.Content
                         .ReadAsStringAsync().Result.Should().Be("dummy response");
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_MockVerificationClosesSessionImplicitly()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("/mocks/session")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                var sessionId = response.Content.ReadAsStringAsync().Result;
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest($"mocks/{sessionId}/verify")
+                        .And(msg =>
+                             {
+                                 msg.Content = new StringContent("{resource:'test'");
+                             })
+                        .GetAsync();
+
+                spyDataStore.EndedSessionId
+                            .Should().Be(sessionId);
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WhenMockingIsEnabled_VerifiesTheCallMade()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("/mocks/session")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                var sessionId = response.Content.ReadAsStringAsync().Result;
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                var verificationResponse = await testServer
+                                                   .CreateRequest($"mocks/{sessionId}/verify")
+                                                   .And(msg =>
+                                                        {
+                                                            msg.Content = new StringContent("{resource:'test'");
+                                                        })
+                                                   .GetAsync();
+
+                var verificationResponseObject = JsonConvert
+                        .DeserializeObject<VerificationResponse>
+                        (verificationResponse.Content.ReadAsStringAsync().Result);
+
+                verificationResponseObject
+                        .InvocationCount.Should().Be(1);
+                verificationResponseObject
+                        .Resource.Should().Be("test");
             }
         }
     }

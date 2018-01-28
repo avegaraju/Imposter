@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 
+using Newtonsoft.Json;
+
 namespace FluentImposter.AspnetCore
 {
     public static class ApplicationBuilderExtension
@@ -50,6 +52,10 @@ namespace FluentImposter.AspnetCore
                                    routeBuilder.MapVerb("Post",
                                                         "mocks/session",
                                                         CreateMockingSessionRequestHandler());
+
+                                   routeBuilder.MapVerb("Get",
+                                                        "mocks/{sessionId}/verify",
+                                                        VerifyMockingRequestHandler());
                                });
 
             RequestDelegate CreateMockingSessionRequestHandler()
@@ -65,6 +71,22 @@ namespace FluentImposter.AspnetCore
                         await ReturnErrorResponse(context);
                     }
                 };
+            }
+
+            RequestDelegate VerifyMockingRequestHandler()
+            {
+                return async context =>
+                       {
+                           if (ActiveSessionExists())
+                               _dataStore.EndSession(_currentSession);
+
+                           var verificationResponse = _dataStore.GetVerificationResponse();
+
+                           context.Response.StatusCode = (int)HttpStatusCode.OK;
+
+                           await context.Response
+                                        .WriteAsync(JsonConvert.SerializeObject(verificationResponse));
+                       };
             }
 
             async Task CreateNewMockingSession(HttpContext context)

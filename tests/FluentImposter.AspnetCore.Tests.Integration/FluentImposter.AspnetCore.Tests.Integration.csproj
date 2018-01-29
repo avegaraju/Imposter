@@ -245,7 +245,7 @@
   <ItemGroup>
     <Compile Include="ApplicationBuilderExtensionTests.cs" />
     <Compile Include="Fakes\FakeDataStoreExtension.cs" />
-    <Compile Include="Fakes\FakeImposterWithMockedReqeustContent.cs" />
+    <Compile Include="Fakes\FakeImposterWithMockedRequestContent.cs" />
     <Compile Include="Fakes\FakeImposterWithRequestContent.cs" />
     <Compile Include="Fakes\FakeImposterWithRequestHeader.cs" />
     <Compile Include="Fakes\FakeImposterWithRequestHeaderAndContent.cs" />

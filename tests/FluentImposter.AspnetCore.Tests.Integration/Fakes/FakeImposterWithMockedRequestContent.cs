@@ -4,11 +4,11 @@ using FluentImposter.Core.Entities;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
 {
-    internal class FakeImposterWithMockedReqeustContent
+    internal class FakeImposterWithMockedRequestContent
     {
         private readonly HttpMethod _httpMethod;
 
-        public FakeImposterWithMockedReqeustContent(HttpMethod httpMethod)
+        public FakeImposterWithMockedRequestContent(HttpMethod httpMethod)
         {
             _httpMethod = httpMethod;
         }

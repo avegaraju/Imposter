@@ -212,7 +212,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -247,7 +247,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -280,7 +280,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -314,7 +314,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -382,7 +382,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -418,7 +418,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -452,7 +452,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -511,7 +511,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -555,7 +555,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -606,7 +606,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())
@@ -651,7 +651,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
             using (var testServer = new TestServerBuilder()
 
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedRequestContent(HttpMethod.Post)
                                                                      .Build(),
                                                              spyDataStore)
                     .Build())

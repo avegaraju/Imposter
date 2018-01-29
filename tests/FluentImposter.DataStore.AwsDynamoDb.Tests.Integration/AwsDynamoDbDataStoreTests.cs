@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -199,6 +200,64 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
                     .Should().Be("test".ToAsciiBytes().ToBase64String());
             response.MatchedCondition
                     .Should().Be(expr.ToString());
+        }
+
+        [Fact]
+        public void GetVerificationResponse_WhenResourceIsFound_ReturnsVerificationResponses()
+        {
+            var sut = CreateSut();
+
+            var sessionId = sut.CreateSession();
+            var requestId = sut.StoreRequest(sessionId, "/testResource", HttpMethod.Get, "test".ToAsciiBytes());
+
+            Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
+
+            sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
+
+            var verificationReponses = sut.GetVerificationResponse(sessionId, "/testResource");
+
+            var expectedObject = new List<VerificationResponse>
+                                 {
+                                     new VerificationResponse()
+                                     {
+                                         Resource = "/testResource"
+                                     }
+                                 };
+
+            verificationReponses
+                    .Should().BeEquivalentTo(expectedObject);
+        }
+
+        [Fact]
+        public void GetVerificationResponse_WhenResourceIsFoundMultipleTimes_ReturnsThoseManyVerificationResponses()
+        {
+            var sut = CreateSut();
+
+            var sessionId = sut.CreateSession();
+            var requestId1 = sut.StoreRequest(sessionId, "/testResource", HttpMethod.Get, "test".ToAsciiBytes());
+            var requestId2 = sut.StoreRequest(sessionId, "/testResource", HttpMethod.Get, "test".ToAsciiBytes());
+
+            Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
+
+            sut.StoreResponse(requestId1, "test", expr.ToString(), "test".ToAsciiBytes());
+            sut.StoreResponse(requestId2, "test", expr.ToString(), "test".ToAsciiBytes());
+
+            var verificationReponses = sut.GetVerificationResponse(sessionId, "/testResource");
+
+            var expectedObject = new List<VerificationResponse>
+                                 {
+                                     new VerificationResponse()
+                                     {
+                                         Resource = "/testResource"
+                                     },
+                                     new VerificationResponse()
+                                     {
+                                         Resource = "/testResource"
+                                     }
+                                 };
+
+            verificationReponses
+                    .Should().BeEquivalentTo(expectedObject);
         }
 
         private static AwsDynamoDbDataStore CreateSut()

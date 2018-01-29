@@ -8,9 +8,9 @@
     <owners>Ashish Vegaraju</owners>
     <PackageLicenseUrl>https://github.com/avegaraju/Imposter/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/avegaraju/Imposter</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</PackageIconUrl>
+    <iconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</iconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <description>Simple over the wire test doubles. This package allows to stub or mock a REST resource.</description>
+    <description>Aspnet core middleware to spin up rest resources dynamically. This package is part of project Imposter which provides simple over the wire test doubles. Project Imposter allows to stub or mock a REST resource.</description>
     <PackageReleaseNotes>Aspnet core middleware to spin up rest resources dynamically.</PackageReleaseNotes>
     <copyright>Copyright 2018</copyright>
     <PackageTags>Imposter, FluentImposter, test-doubles, over-the-wire, mocking, aspnetcore, fake, mocking-server</PackageTags>

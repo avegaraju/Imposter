@@ -2,7 +2,7 @@
 
 namespace FluentImposter.Core.Models
 {
-    public class Requests
+    internal class Requests
     {
         public Guid Id { get; set; }
         public Guid SessionId { get; set; }

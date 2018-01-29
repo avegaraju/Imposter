@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace FluentImposter.DataStore.AwsDynamoDb.Models
+namespace FluentImposter.Core.Models
 {
-    public class Sessions
+    internal class Sessions
     {
         public Guid Id { get; set; }
         public DateTime StartDateTime { get; set; }

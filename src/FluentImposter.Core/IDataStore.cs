@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
+
+using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {
@@ -17,5 +20,7 @@ namespace FluentImposter.Core
                                string imposterName,
                                string matchedCondition,
                                byte[] responsePayload);
+
+        IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource);
     }
 }

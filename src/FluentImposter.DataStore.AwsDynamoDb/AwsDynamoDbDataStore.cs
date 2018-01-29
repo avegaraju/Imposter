@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 
 using FluentImposter.Core;
+using FluentImposter.Core.Entities;
 using FluentImposter.Core.Exceptions;
-using FluentImposter.DataStore.AwsDynamoDb.Models;
+using FluentImposter.Core.Models;
 
 using ServiceStack.Aws.DynamoDb;
 
@@ -90,6 +94,21 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                             });
 
             return responseId;
+        }
+
+        public IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource)
+        {
+            var requests = _dynamo.Scan<Requests>(new ScanRequest()
+                                                  {
+                                                      TableName = "Requests"
+                                                  });
+
+            return requests.Where(r => r.SessionId == sessionId
+                                       && r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase))
+                           .Select(v => new VerificationResponse()
+                                        {
+                                            Resource = v.Resource
+                                        });
         }
 
         private bool RequestExists(Guid requestId)

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 
 using FluentImposter.Core;
+using FluentImposter.Core.Entities;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Spies
 {
@@ -56,6 +58,17 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             ResponsePayload = responsePayload;
 
             return NewResponseId = Guid.NewGuid();
+        }
+
+        public IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource)
+        {
+            return new List<VerificationResponse>
+                   {
+                       new VerificationResponse()
+                       {
+                           Resource = resource
+                       }
+                   };
         }
     }
 }

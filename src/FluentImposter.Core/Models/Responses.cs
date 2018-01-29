@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace FluentImposter.DataStore.AwsDynamoDb.Models
+namespace FluentImposter.Core.Models
 {
-    public class Responses
+    internal class Responses
     {
         public Guid Id { get; set; }
         public Guid RequestId { get; set; }

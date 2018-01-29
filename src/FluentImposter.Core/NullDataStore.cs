@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+
+using FluentImposter.Core.Entities;
 
 namespace FluentImposter.Core
 {
@@ -22,6 +26,11 @@ namespace FluentImposter.Core
         public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
         {
             return Guid.Empty;
+        }
+
+        public IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource)
+        {
+            return new List<VerificationResponse>();
         }
     }
 }

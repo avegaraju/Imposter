@@ -9,7 +9,7 @@ using FluentAssertions;
 
 using FluentImposter.Core.Entities;
 using FluentImposter.Core.Exceptions;
-using FluentImposter.DataStore.AwsDynamoDb.Models;
+using FluentImposter.Core.Models;
 
 using Microsoft.Extensions.Configuration;
 

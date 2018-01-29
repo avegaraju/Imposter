@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 
 using FluentImposter.Core.Entities;
@@ -20,6 +21,6 @@ namespace FluentImposter.Core
                                string matchedCondition,
                                byte[] responsePayload);
 
-        VerificationResponse GetVerificationResponse(Guid sessionId, string resource);
+        IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource);
     }
 }

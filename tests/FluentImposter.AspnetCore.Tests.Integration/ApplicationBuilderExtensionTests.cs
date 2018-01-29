@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
@@ -548,7 +549,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         }
 
         [Fact]
-        public async void Middleware_WhenMockingIsEnabled_VerifiesTheCallMade()
+        public async void Middleware_WhenMockingIsEnabled_VerifiesTheCallIsMade()
         {
             var spyDataStore = new SpyDataStore();
 
@@ -582,18 +583,111 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                                    .CreateRequest($"mocks/{sessionId}/verify")
                                                    .And(msg =>
                                                         {
-                                                            msg.Content = new StringContent("{resource:'test'");
+                                                            msg.Content = new StringContent("{resource:'test'}");
                                                         })
                                                    .GetAsync();
 
                 var verificationResponseObject = JsonConvert
-                        .DeserializeObject<VerificationResponse>
+                        .DeserializeObject<List<VerificationResponse>>
                         (verificationResponse.Content.ReadAsStringAsync().Result);
 
                 verificationResponseObject
-                        .InvocationCount.Should().Be(1);
-                verificationResponseObject
+                        .Should().HaveCount(1);
+
+                verificationResponseObject [0]
                         .Resource.Should().Be("test");
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WithInvalidSessionIdInTheUri_ReturnsBadRequest()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                await testServer
+                        .CreateRequest("/mocks/session")
+                        .And(message =>
+                             {
+                                 message.Content =
+                                         new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
+                        .PostAsync();
+
+                var verificationResponse = await testServer
+                                                   .CreateRequest("mocks/abnnndbbd/verify")
+                                                   .And(msg =>
+                                                        {
+                                                            msg.Content = new StringContent("{resource:'test'}");
+                                                        })
+                                                   .GetAsync();
+
+                verificationResponse.StatusCode
+                                    .Should().Be(HttpStatusCode.BadRequest);
+
+                verificationResponse.Content
+                                    .ReadAsStringAsync().Result.Should().Contain("abnnndbbd");
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WithInvalidVerificationRequest_ReturnsBadRequest()
+        {
+            var spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithMockedReqeustContent(HttpMethod.Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("/mocks/session")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                var sessionId = response.Content.ReadAsStringAsync().Result;
+
+                await testServer
+                        .CreateRequest("test")
+                        .And(message =>
+                             {
+                                 message.Content = new StringContent("dummy request");
+                             })
+                        .PostAsync();
+
+                var verificationResponse = await testServer
+                                                   .CreateRequest($"mocks/{sessionId}/verify")
+                                                   .And(msg =>
+                                                        {
+                                                            msg.Content = new StringContent("nnnn:bbbb");
+                                                        })
+                                                   .GetAsync();
+
+                verificationResponse.StatusCode
+                                    .Should().Be(HttpStatusCode.BadRequest);
+
+                verificationResponse.Content.ReadAsStringAsync().Result
+                                    .Should().Contain("not a valid JSON");
             }
         }
     }

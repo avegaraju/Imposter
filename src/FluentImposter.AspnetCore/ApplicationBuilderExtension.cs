@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using FluentImposter.Core;
 using FluentImposter.Core.Entities;
+using FluentImposter.Core.Exceptions;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -80,13 +81,69 @@ namespace FluentImposter.AspnetCore
                            if (ActiveSessionExists())
                                _dataStore.EndSession(_currentSession);
 
-                           var verificationResponse = _dataStore.GetVerificationResponse();
+                           try
+                           {
+                               var verificationResponses = GetVerificationResponses(context);
 
-                           context.Response.StatusCode = (int)HttpStatusCode.OK;
+                               context.Response.StatusCode = (int)HttpStatusCode.OK;
 
-                           await context.Response
-                                        .WriteAsync(JsonConvert.SerializeObject(verificationResponse));
+                               await context.Response
+                                            .WriteAsync(JsonConvert.SerializeObject(verificationResponses));
+                           }
+                           catch (Exception ex)
+                           {
+                               if (ex is InvalidSessionIdInUriException
+                                   || ex is InvalidVerificationRequestException)
+                               {
+                                   context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+                                   await context.Response
+                                                .WriteAsync(ex.Message);
+                               }
+                           }
                        };
+
+                IEnumerable<VerificationResponse> GetVerificationResponses(HttpContext context)
+                {
+                    var sessionId = GetSessionIdFromUri(context);
+                    var resource = GetResourceFromBody(context);
+
+                    return _dataStore.GetVerificationResponse(Guid.Parse(sessionId), resource);
+                }
+
+                string GetSessionIdFromUri(HttpContext context)
+                {
+                    var path = context.Request.Path.Value;
+
+                    var startIndex = "/mocks/".Length;
+                    var endIndex = path.LastIndexOf("/verify", StringComparison.Ordinal) - "/verify".Length;
+
+                    var sessionId = path.Substring(startIndex, endIndex);
+
+                    if (!Guid.TryParse(sessionId, out _))
+                        throw new InvalidSessionIdInUriException($"{sessionId} is not a valid session Id.");
+
+                    return sessionId;
+                }
+
+                string GetResourceFromBody(HttpContext context)
+                {
+                    using (StreamReader streamReader = new StreamReader(context.Request.Body))
+                    {
+                        var body = streamReader.ReadToEnd();
+
+                        try
+                        {
+                            return JsonConvert
+                                    .DeserializeObject<VerificationRequest>(body).Resource;
+                        }
+                        catch (JsonReaderException e)
+                        {
+                            throw new InvalidVerificationRequestException("Verification request is not a valid JSON",
+                                                                          e);
+                        }
+                    }
+                }
             }
 
             async Task CreateNewMockingSession(HttpContext context)
@@ -108,6 +165,8 @@ namespace FluentImposter.AspnetCore
                 await context.Response.WriteAsync("No data store configured to enable mocking.");
             }
         }
+
+        
 
         private static bool DataStoreIsConfigured()
         {

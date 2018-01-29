@@ -1,8 +1,7 @@
 ﻿namespace FluentImposter.Core.Entities
 {
-    public class VerificationResponse
+    public class VerificationRequest
     {
         public string Resource { get; set; }
-        
     }
 }

@@ -690,5 +690,32 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                     .Should().Contain("not a valid JSON");
             }
         }
+
+        [Fact]
+        public async void Middleware_ImposterCanStubbingAResourceWithAPatternInUri()
+        {
+            SpyDataStore spyDataStore = new SpyDataStore();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterStubbingAResourceWithAPatternInUri(HttpMethod
+                                                                                                                     .Post)
+                                                                     .Build(),
+                                                             spyDataStore)
+                    .Build())
+            {
+                var response = await testServer
+                                       .CreateRequest("products/1?requestid=12344")
+                                       .And(message =>
+                                            {
+                                                message.Content =
+                                                        new StringContent("dummy request");
+                                            })
+                                       .PostAsync();
+
+                response.Content.ReadAsStringAsync().Result
+                        .Should().Be("dummy response");
+            }
+        }
     }
 }

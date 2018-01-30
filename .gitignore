@@ -290,3 +290,6 @@ __pycache__/
 # Continue Integration files and folders
 tools/
 build/ 
+
+#ncrunchfiles
+*.ncrunchsolution

@@ -17,7 +17,7 @@ namespace SampleClientService
         {
             var userIdentityImposter = new UserIdentityImposter().Build();
 
-            var imposterConfiguration = new ImposterConfiguration(new[]
+            var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
                                                                   {
                                                                       userIdentityImposter
                                                                   });

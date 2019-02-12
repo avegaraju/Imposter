@@ -34,7 +34,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
         {
-            var imposterConfiguration = new ImposterConfiguration(new[]
+            var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
                                                                   {
                                                                       imposter
                                                                   });
@@ -50,7 +50,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public TestServerBuilder UsingImposterMiddleWareWithSpyDataStore(Imposter imposter,
                                                                             IDataStore spyDataStore)
         {
-            var imposterConfiguration = new ImposterConfiguration(new[]
+            var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
                                                                   {
                                                                       imposter
                                                                   })

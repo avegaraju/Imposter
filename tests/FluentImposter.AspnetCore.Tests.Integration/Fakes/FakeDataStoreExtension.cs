@@ -5,11 +5,11 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
 {
     internal static class FakeDataStoreExtension
     {
-        public static ImposterConfiguration UseSpyDataStore(this ImposterConfiguration imposterConfiguration, IDataStore spyDataStore)
+        public static ImpostersAsMockConfiguration UseSpyDataStore(this ImpostersAsMockConfiguration impostersConfiguration, IDataStore spyDataStore)
         {
-            imposterConfiguration.SetDataStore(spyDataStore);
+            impostersConfiguration.SetDataStore(spyDataStore);
 
-            return imposterConfiguration;
+            return impostersConfiguration;
         }
     }
 }

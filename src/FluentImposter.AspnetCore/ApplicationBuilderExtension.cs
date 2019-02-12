@@ -25,11 +25,12 @@ namespace FluentImposter.AspnetCore
         private static Guid _currentSession = Guid.Empty;
 
         public static void UseImposters(this IApplicationBuilder applicationBuilder,
-                                        ImposterConfiguration imposterConfiguration)
+                                        ImpostersAsMockConfiguration impostersAsMockConfiguration,
+                                        ImpostersAsStubConfiguration impostersAsStubConfiguration)
         {
-            _dataStore = imposterConfiguration.DataStore;
+            _dataStore = impostersAsMockConfiguration.DataStore;
 
-            CreateRoutes(imposterConfiguration.Imposters, applicationBuilder);
+            CreateRoutes(impostersAsMockConfiguration.Imposters, applicationBuilder);
         }
 
         private static void CreateRoutes(Imposter[] imposters,

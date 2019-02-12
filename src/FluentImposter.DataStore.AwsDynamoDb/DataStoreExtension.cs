@@ -6,12 +6,12 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 {
     public static class DataStoreExtension
     {
-        public static ImposterConfiguration UseDynamoDb(this ImposterConfiguration imposterConfiguration,
+        public static ImpostersAsMockConfiguration UseDynamoDb(this ImpostersAsMockConfiguration impostersConfiguration,
                                                         IAmazonDynamoDB amazonDynamoDbClient)
         {
-            imposterConfiguration.SetDataStore(new AwsDynamoDbDataStore(amazonDynamoDbClient));
+            impostersConfiguration.SetDataStore(new AwsDynamoDbDataStore(amazonDynamoDbClient));
 
-            return imposterConfiguration;
+            return impostersConfiguration;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                                                          spyDataStore);
 
             Action<IApplicationBuilder> action =
-                    app => app.UseStubImposters(imposterConfiguration);
+                    app => app.UseMockImposters(imposterConfiguration);
 
             _webHostBuilder.Configure(action);
 

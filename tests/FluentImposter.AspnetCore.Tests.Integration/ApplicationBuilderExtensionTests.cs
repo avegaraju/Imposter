@@ -115,31 +115,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         [Fact]
         public async void
-                Middleware_ImposterReceivesMockSessionCreationRequest_WithoutADataStore_ReturnsInternalServerError()
-        {
-            using (var testServer = new TestServerBuilder()
-
-                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent(HttpMethod.Post).Build())
-                    .Build())
-            {
-                var response = await testServer
-                                       .CreateRequest("mocks/session")
-                                       .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
-                                       .PostAsync();
-
-                response.StatusCode
-                        .Should().Be(HttpStatusCode.InternalServerError);
-                response.Content.ReadAsStringAsync().Result
-                        .Should().Be("No data store configured to enable mocking.");
-            }
-        }
-
-        [Fact]
-        public async void
                 Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsPost_ReturnsCreatedWithValidSession()
         {
             var spyDataStore = new SpyDataStore();

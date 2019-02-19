@@ -19,7 +19,7 @@ using Newtonsoft.Json;
 
 namespace FluentImposter.AspnetCore
 {
-    public class MockingRouteCreator: RouteCreator,
+    public class MockingRouteCreator: RouteCreatorBase,
                                       IRouteCreator<IApplicationBuilder>
     {
         private static Guid _currentSession = Guid.Empty;
@@ -58,7 +58,9 @@ namespace FluentImposter.AspnetCore
             {
                 var request = BuildRequest(context);
 
-                var (response, matchedCondition) = _rulesEvaluator.EvaluateRules(imposter, context);
+                var (response, matchedCondition) = _rulesEvaluator.EvaluateRules(imposter,
+                                                                                 context,
+                                                                                 request);
 
                 StoreRequestAndResponse(imposter, request, response, matchedCondition);
 

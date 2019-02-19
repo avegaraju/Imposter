@@ -34,13 +34,13 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
         {
-            var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
+            var impostersAsStubConfiguration = new ImpostersAsStubConfiguration(new[]
                                                                   {
                                                                       imposter
                                                                   });
 
             Action<IApplicationBuilder> action =
-                    app => app.UseImposters(imposterConfiguration);
+                    app => app.UseStubImposters(impostersAsStubConfiguration);
 
             _webHostBuilder.Configure(action);
 
@@ -51,13 +51,13 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                                                                             IDataStore spyDataStore)
         {
             var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
-                                                                  {
-                                                                      imposter
-                                                                  })
-                    .UseSpyDataStore(spyDataStore);
+                                                                         {
+                                                                             imposter
+                                                                         },
+                                                                         spyDataStore);
 
             Action<IApplicationBuilder> action =
-                    app => app.UseImposters(imposterConfiguration);
+                    app => app.UseStubImposters(imposterConfiguration);
 
             _webHostBuilder.Configure(action);
 

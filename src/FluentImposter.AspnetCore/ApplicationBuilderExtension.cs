@@ -24,13 +24,24 @@ namespace FluentImposter.AspnetCore
         private static IDataStore _dataStore;
         private static Guid _currentSession = Guid.Empty;
 
-        public static void UseImposters(this IApplicationBuilder applicationBuilder,
-                                        ImpostersAsMockConfiguration impostersAsMockConfiguration,
+        public static void UseMockImposters(this IApplicationBuilder applicationBuilder,
+                                            ImpostersAsMockConfiguration impostersAsMockConfiguration)
+        {
+            var mockingRouteCreator =
+                    new MockingRouteCreator(impostersAsMockConfiguration,
+                                            new ImposterRulesEvaluator());
+
+            mockingRouteCreator.CreateRoutes(applicationBuilder);
+
+        }
+        public static void UseStubImposters(this IApplicationBuilder applicationBuilder,
                                         ImpostersAsStubConfiguration impostersAsStubConfiguration)
         {
-            _dataStore = impostersAsMockConfiguration.DataStore;
+            var stubbingRouteCreator =
+                    new StubbingRouteCreator(impostersAsStubConfiguration,
+                                             new ImposterRulesEvaluator());
 
-            CreateRoutes(impostersAsMockConfiguration.Imposters, applicationBuilder);
+            stubbingRouteCreator.CreateRoutes(applicationBuilder);
         }
 
         private static void CreateRoutes(Imposter[] imposters,

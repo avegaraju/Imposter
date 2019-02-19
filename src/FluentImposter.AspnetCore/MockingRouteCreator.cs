@@ -19,7 +19,8 @@ using Newtonsoft.Json;
 
 namespace FluentImposter.AspnetCore
 {
-    public class MockingRouteCreator: IRouteCreator<IApplicationBuilder>
+    public class MockingRouteCreator: RouteCreator,
+                                      IRouteCreator<IApplicationBuilder>
     {
         private static Guid _currentSession = Guid.Empty;
         private readonly ImpostersAsMockConfiguration _configuration;
@@ -40,16 +41,9 @@ namespace FluentImposter.AspnetCore
 
         private void CreateImposterResources(IApplicationBuilder applicationBuilder)
         {
-            foreach (var imposter in _configuration.Imposters)
-            {
-                applicationBuilder
-                        .UseRouter(routeBuilder =>
-                                   {
-                                       routeBuilder.MapVerb(imposter.Method.ToString(),
-                                                            imposter.Resource,
-                                                            EvaluateImposterRules(imposter));
-                                   });
-            }
+            base.CreateImposterResourceRoutes(applicationBuilder,
+                                              _configuration.Imposters,
+                                              EvaluateImposterRules);
 
             RequestDelegate EvaluateImposterRules(Imposter imposter)
             {
@@ -120,16 +114,16 @@ namespace FluentImposter.AspnetCore
         private void CreateRoutesForMocking(IApplicationBuilder applicationBuilder)
         {
             applicationBuilder
-                                .UseRouter(routeBuilder =>
-                                {
-                                    routeBuilder.MapVerb("Post",
-                                             "mocks/session",
-                                             CreateMockingSessionRequestHandler());
+                    .UseRouter(routeBuilder =>
+                               {
+                                   routeBuilder.MapVerb("Post",
+                                                        "mocks/session",
+                                                        CreateMockingSessionRequestHandler());
 
-                                    routeBuilder.MapVerb("Get",
-                                             "mocks/{sessionId}/verify",
-                                             VerifyMockingRequestHandler());
-                                });
+                                   routeBuilder.MapVerb("Get",
+                                                        "mocks/{sessionId}/verify",
+                                                        VerifyMockingRequestHandler());
+                               });
         }
 
         private RequestDelegate CreateMockingSessionRequestHandler()
@@ -155,30 +149,30 @@ namespace FluentImposter.AspnetCore
         private RequestDelegate VerifyMockingRequestHandler()
         {
             return async context =>
-            {
-                if (ActiveSessionExists)
-                    _configuration.DataStore.EndSession(_currentSession);
+                   {
+                       if (ActiveSessionExists)
+                           _configuration.DataStore.EndSession(_currentSession);
 
-                try
-                {
-                    var verificationResponses = GetVerificationResponses(context);
+                       try
+                       {
+                           var verificationResponses = GetVerificationResponses(context);
 
-                    context.Response.StatusCode = (int)HttpStatusCode.OK;
+                           context.Response.StatusCode = (int)HttpStatusCode.OK;
 
-                    await context.Response
-                                 .WriteAsync(JsonConvert.SerializeObject(verificationResponses));
-                }
-                catch (Exception ex)
-                {
-                    if (ex is InvalidSessionIdInUriException
-                        || ex is InvalidVerificationRequestException)
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                           await context.Response
+                                        .WriteAsync(JsonConvert.SerializeObject(verificationResponses));
+                       }
+                       catch (Exception ex)
+                       {
+                           if (ex is InvalidSessionIdInUriException
+                               || ex is InvalidVerificationRequestException)
+                           {
+                               context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-                        await context.Response.WriteAsync(ex.Message);
-                    }
-                }
-            };
+                               await context.Response.WriteAsync(ex.Message);
+                           }
+                       }
+                   };
 
             IEnumerable<VerificationResponse> GetVerificationResponses(HttpContext context)
             {
@@ -224,6 +218,6 @@ namespace FluentImposter.AspnetCore
             }
         }
 
-        private static bool ActiveSessionExists=> _currentSession != Guid.Empty;
+        private static bool ActiveSessionExists => _currentSession != Guid.Empty;
     }
 }

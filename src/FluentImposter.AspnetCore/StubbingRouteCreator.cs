@@ -5,11 +5,11 @@ using FluentImposter.Core.Entities;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 
 namespace FluentImposter.AspnetCore
 {
-    public class StubbingRouteCreator: IRouteCreator<IApplicationBuilder>
+    public class StubbingRouteCreator: RouteCreator,
+                                       IRouteCreator<IApplicationBuilder>
     {
         private readonly ImpostersAsStubConfiguration _configuration;
         private readonly ImposterRulesEvaluator _rulesEvaluator;
@@ -23,16 +23,9 @@ namespace FluentImposter.AspnetCore
 
         public void CreateRoutes(IApplicationBuilder applicationBuilder)
         {
-            foreach (var imposter in _configuration.Imposters)
-            {
-                applicationBuilder
-                        .UseRouter(routeBuilder =>
-                                   {
-                                       routeBuilder.MapVerb(imposter.Method.ToString(),
-                                                            imposter.Resource,
-                                                            EvaluateImposterRules(imposter));
-                                   });
-            }
+            base.CreateImposterResourceRoutes(applicationBuilder,
+                                              _configuration.Imposters,
+                                              EvaluateImposterRules);
 
             RequestDelegate EvaluateImposterRules(Imposter imposter)
             {

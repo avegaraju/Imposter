@@ -20,7 +20,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
                                                   "match this text"))
                     .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
@@ -42,7 +42,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new []
                                                                               {
                                                                                   "text/plain",
@@ -66,7 +66,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
                                                   "match this text"))
                     .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
@@ -88,7 +88,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.Content.Contains(requestContent))
                     .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
                     .Build();
@@ -116,7 +116,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
                     .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
                     .Build();
@@ -145,7 +145,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
                     .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
                     .When(r=> r.Content.Contains(requestContent))
@@ -177,7 +177,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response for matched header";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
                     .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
                     .When(r => r.Content.Contains(requestContent))
@@ -209,7 +209,7 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response for matched header";
 
             var imposter = new ImposterDefinition("test")
-                    .StubsResource("/test", HttpMethod.Post)
+                    .DeclareResource("/test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new[]{"test"}))
                     .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
                     .When(r => r.Content.Contains(requestContent))

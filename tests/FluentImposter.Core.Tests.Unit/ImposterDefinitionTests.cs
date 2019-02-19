@@ -14,39 +14,11 @@ namespace FluentImposter.Core.Tests.Unit
     public class ImposterDefinitionTests
     {
         [Fact]
-        public void ImposterDefinition_ImposterCanStubAResource()
-        {
-            ImposterDefinition imposterDefinition = CreateSut();
-
-            var imposter = imposterDefinition.StubsResource("/test", HttpMethod.Post)
-                    .Build();
-
-            imposter.Resource
-                    .Should().Be("/test");
-            imposter.Behavior
-                    .Should().Be(ImposterBehavior.Stub);
-        }
-
-        [Fact]
-        public void ImposterDefinition_ImposterCanMockAResource()
-        {
-            ImposterDefinition imposterDefinition = CreateSut();
-
-            var imposter = imposterDefinition.MocksResource("/test", HttpMethod.Post)
-                    .Build();
-
-            imposter.Resource
-                    .Should().Be("/test");
-            imposter.Behavior
-                    .Should().Be(ImposterBehavior.Mock);
-        }
-
-        [Fact]
         public void ImposterDefinition_AllowsToDefineHttpMethod()
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.MocksResource("/test", HttpMethod.Post)
+            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
                                              .Build();
 
             imposter.Method
@@ -58,7 +30,7 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.StubsResource("/test", HttpMethod.Post)
+            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
                                              .When(r => r.Content.Contains(""))
                                              .Then(new DefaultResponseCreator())
                                              .Build();
@@ -74,7 +46,7 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.StubsResource("/test", HttpMethod.Post)
+            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
                                              .When(r => r.Content.Contains(""))
                                              .Then(new DefaultResponseCreator())
                                              .When(r => r.Content.StartsWith("test"))
@@ -102,7 +74,7 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.StubsResource("/test", HttpMethod.Post)
+            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
                                              .When(r => r.RequestHeader.Contains("Accept"))
                                              .Then(new DefaultResponseCreator())
                                              .Build();
@@ -118,7 +90,7 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.StubsResource("/test", HttpMethod.Post)
+            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
                                              .When(r => r.Content.Contains(""))
                                              .Then(new DefaultResponseCreator())
                                              .Build();

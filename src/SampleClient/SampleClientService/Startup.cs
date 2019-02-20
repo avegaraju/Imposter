@@ -17,12 +17,12 @@ namespace SampleClientService
         {
             var userIdentityImposter = new UserIdentityImposter().Build();
 
-            var imposterConfiguration = new ImposterConfiguration(new[]
+            var imposterConfiguration = new ImpostersAsStubConfiguration(new[]
                                                                   {
                                                                       userIdentityImposter
                                                                   });
             
-            app.UseImposters(imposterConfiguration);
+            app.UseStubImposters(imposterConfiguration);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .StubsResource("test", HttpMethod.Post)
+                    .DeclareResource("test", HttpMethod.Post)
                     .When(r => r.RequestHeader.ContainsKeyAndValues("Accept",
                                                                     new[]
                                                                     {

@@ -34,13 +34,13 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
         {
-            var imposterConfiguration = new ImposterConfiguration(new[]
+            var impostersAsStubConfiguration = new ImpostersAsStubConfiguration(new[]
                                                                   {
                                                                       imposter
                                                                   });
 
             Action<IApplicationBuilder> action =
-                    app => app.UseImposters(imposterConfiguration);
+                    app => app.UseStubImposters(impostersAsStubConfiguration);
 
             _webHostBuilder.Configure(action);
 
@@ -50,14 +50,14 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public TestServerBuilder UsingImposterMiddleWareWithSpyDataStore(Imposter imposter,
                                                                             IDataStore spyDataStore)
         {
-            var imposterConfiguration = new ImposterConfiguration(new[]
-                                                                  {
-                                                                      imposter
-                                                                  })
-                    .UseSpyDataStore(spyDataStore);
+            var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
+                                                                         {
+                                                                             imposter
+                                                                         },
+                                                                         spyDataStore);
 
             Action<IApplicationBuilder> action =
-                    app => app.UseImposters(imposterConfiguration);
+                    app => app.UseMockImposters(imposterConfiguration);
 
             _webHostBuilder.Configure(action);
 

@@ -12,7 +12,6 @@ namespace FluentImposter.Core.Entities
 
         public string Name { get; }
         public string Resource { get; private set; }
-        public ImposterBehavior Behavior { get; private set; }
         public HttpMethod Method { get; private set; }
         public IEnumerable<Rule> Rules => _rules;
 
@@ -38,11 +37,6 @@ namespace FluentImposter.Core.Entities
         internal void SetResource(string resourcePath)
         {
             Resource = resourcePath;
-        }
-
-        internal void SetBehavior(ImposterBehavior imposterBehavior)
-        {
-            Behavior = imposterBehavior;
         }
 
         internal void SetMethod(HttpMethod method)

@@ -17,7 +17,7 @@ namespace SampleClientService
         public Imposter Build()
         {
             return new ImposterDefinition("test")
-                    .StubsResource("users", HttpMethod.Post)
+                    .DeclareResource("users", HttpMethod.Post)
                     .When(r => r.Content.Contains("abc@xyz.com"))
                     .Then(new DummyResponseCreator())
                     .Build();

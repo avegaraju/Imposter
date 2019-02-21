@@ -11,10 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Appify.FluentImposter.AspnetCore" Version="1.0.52" />
-    <PackageReference Include="Appify.FluentImposter.DataStore.AwsDynamoDb" Version="1.0.52" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluentImposter.AspnetCore\FluentImposter.AspnetCore.csproj" />
+    <ProjectReference Include="..\FluentImposter.DataStore.AwsDynamoDb\FluentImposter.DataStore.AwsDynamoDb.csproj" />
   </ItemGroup>
 
 </Project>

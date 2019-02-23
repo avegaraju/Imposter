@@ -17,75 +17,8 @@ using Xunit;
 
 namespace FluentImposter.AspnetCore.Tests.Integration
 {
-    public class ApplicationBuilderExtensionTests
+    public class ApplicationBuilderExtensionMockTests
     {
-        [Fact]
-        public async void Middleware_ImposterReceivesRequestWithMatchingContent_ReturnsPreDefinedResponse()
-        {
-            using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new FakeImposterWithRequestContent(HttpMethod.Get).Build())
-                    .Build())
-            {
-                var response = await testServer
-                                       .CreateRequest("test")
-                                       .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy");
-                                            })
-                                       .GetAsync();
-
-                var content = response.Content.ReadAsStringAsync().Result;
-
-                content.Should().Be("dummy response");
-            }
-        }
-
-        [Fact]
-        public async void Middleware_ImposterReceivesRequestWithMatchingHeader_ReturnsPreDefinedResponse()
-        {
-            using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new FakeImposterWithRequestHeader().Build())
-                    .Build())
-            {
-                var response = await testServer
-                                       .CreateRequest("test")
-                                       .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy");
-                                            })
-                                       .AddHeader("Accept", "text/plain")
-                                       .AddHeader("Accept", "text/xml")
-                                       .PostAsync();
-
-                var content = response.Content.ReadAsStringAsync().Result;
-
-                content.Should().Be("dummy response");
-            }
-        }
-
-        [Fact]
-        public async void Middleware_ImposterReceivesRequestWithoutAnyMatchingConditions_ReturnsInternalServerError()
-        {
-            using (var testServer = new TestServerBuilder()
-                    .UsingImpostersMiddleware(new FakeImposterWithRequestHeaderAndContent().Build())
-                    .Build())
-            {
-                var response = await testServer
-                                       .CreateRequest("test")
-                                       .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("This content will not match");
-                                            })
-                                       .AddHeader("this_key_wont_match", "this_too_wont_match")
-                                       .PostAsync();
-
-                response.Content.ReadAsStringAsync().Result.Should().Be("None of evaluators could create a response.");
-            }
-        }
-
         [Fact]
         public async void Middleware_ImposterReceivesMockSessionCreationRequest_WhenTheMethodIsGet_ReturnsNotFound()
         {
@@ -100,10 +33,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var response = await testServer
                                        .CreateRequest("mocks/session")
                                        .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
+                                       {
+                                           message.Content =
+                                                   new StringContent("dummy request");
+                                       })
                                        .GetAsync();
 
                 response.StatusCode
@@ -129,10 +62,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var response = await testServer
                                        .CreateRequest("/mocks/session")
                                        .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
+                                       {
+                                           message.Content =
+                                                   new StringContent("dummy request");
+                                       })
                                        .PostAsync();
 
                 response.StatusCode
@@ -159,10 +92,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 var firstSessionId = spyDataStore.NewSessionId;
@@ -170,10 +103,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 spyDataStore.EndedSessionId.Should().Be(firstSessionId);
@@ -195,10 +128,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var sessionResponse = await testServer
                                               .CreateRequest("/mocks/session")
                                               .And(message =>
-                                                   {
-                                                       message.Content =
-                                                               new StringContent("dummy request");
-                                                   })
+                                              {
+                                                  message.Content =
+                                                          new StringContent("dummy request");
+                                              })
                                               .PostAsync();
 
                 var activeSessionId = sessionResponse.Content.ReadAsStringAsync().Result;
@@ -206,9 +139,9 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 spyDataStore.SessionIdReceivedWithRequest.Should().Be(activeSessionId);
@@ -230,18 +163,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 spyDataStore.RequestedResource.Should().Be("test");
@@ -263,18 +196,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var sessionResponse = await testServer
                                               .CreateRequest("/mocks/session")
                                               .And(message =>
-                                                   {
-                                                       message.Content =
-                                                               new StringContent("dummy request");
-                                                   })
+                                              {
+                                                  message.Content =
+                                                          new StringContent("dummy request");
+                                              })
                                               .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 spyDataStore.HttpMethod.Should().Be(HttpMethod.Post.ToString());
@@ -297,18 +230,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent(requestContent);
-                             })
+                        {
+                            message.Content =
+                                    new StringContent(requestContent);
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 Encoding.ASCII.GetString(spyDataStore.RequestPayload)
@@ -331,18 +264,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 spyDataStore.RequestIdReceivedWhileStoringResponse
@@ -365,18 +298,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 Expression<Func<Request, bool>> condition = r => r.Content.Contains("dummy");
@@ -401,18 +334,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 spyDataStore.ImposterName
@@ -435,47 +368,22 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 Encoding.ASCII
                         .GetString(spyDataStore.ResponsePayload).Should().Be("dummy response");
-            }
-        }
-
-        [Fact]
-        public async void Middleware_WhenDataStoreIsNotConfigured_ReturnsResponseWithoutAnyErrors()
-        {
-            var spyDataStore = new SpyDataStore();
-
-            using (var testServer = new TestServerBuilder()
-
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterWithRequestContent(HttpMethod.Post)
-                                                                     .Build(),
-                                                             spyDataStore)
-                    .Build())
-            {
-                var response = await testServer
-                                       .CreateRequest("test")
-                                       .And(message =>
-                                            {
-                                                message.Content = new StringContent("dummy request");
-                                            })
-                                       .PostAsync();
-
-                response.Content
-                        .ReadAsStringAsync().Result.Should().Be("dummy response");
             }
         }
 
@@ -494,10 +402,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var response = await testServer
                                        .CreateRequest("/mocks/session")
                                        .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
+                                       {
+                                           message.Content =
+                                                   new StringContent("dummy request");
+                                       })
                                        .PostAsync();
 
                 var sessionId = response.Content.ReadAsStringAsync().Result;
@@ -505,17 +413,17 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
                         .CreateRequest($"mocks/{sessionId}/verify")
                         .And(msg =>
-                             {
-                                 msg.Content = new StringContent("{resource:'test'");
-                             })
+                        {
+                            msg.Content = new StringContent("{resource:'test'");
+                        })
                         .GetAsync();
 
                 spyDataStore.EndedSessionId
@@ -538,10 +446,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var response = await testServer
                                        .CreateRequest("/mocks/session")
                                        .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
+                                       {
+                                           message.Content =
+                                                   new StringContent("dummy request");
+                                       })
                                        .PostAsync();
 
                 var sessionId = response.Content.ReadAsStringAsync().Result;
@@ -549,17 +457,17 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 var verificationResponse = await testServer
                                                    .CreateRequest($"mocks/{sessionId}/verify")
                                                    .And(msg =>
-                                                        {
-                                                            msg.Content = new StringContent("{resource:'test'}");
-                                                        })
+                                                   {
+                                                       msg.Content = new StringContent("{resource:'test'}");
+                                                   })
                                                    .GetAsync();
 
                 var verificationResponseObject = JsonConvert
@@ -569,7 +477,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 verificationResponseObject
                         .Should().HaveCount(1);
 
-                verificationResponseObject [0]
+                verificationResponseObject[0]
                         .Resource.Should().Be("test");
             }
         }
@@ -589,10 +497,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("/mocks/session")
                         .And(message =>
-                             {
-                                 message.Content =
-                                         new StringContent("dummy request");
-                             })
+                        {
+                            message.Content =
+                                    new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 await testServer
@@ -606,9 +514,9 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var verificationResponse = await testServer
                                                    .CreateRequest("mocks/abnnndbbd/verify")
                                                    .And(msg =>
-                                                        {
-                                                            msg.Content = new StringContent("{resource:'test'}");
-                                                        })
+                                                   {
+                                                       msg.Content = new StringContent("{resource:'test'}");
+                                                   })
                                                    .GetAsync();
 
                 verificationResponse.StatusCode
@@ -634,10 +542,10 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 var response = await testServer
                                        .CreateRequest("/mocks/session")
                                        .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
+                                       {
+                                           message.Content =
+                                                   new StringContent("dummy request");
+                                       })
                                        .PostAsync();
 
                 var sessionId = response.Content.ReadAsStringAsync().Result;
@@ -645,17 +553,17 @@ namespace FluentImposter.AspnetCore.Tests.Integration
                 await testServer
                         .CreateRequest("test")
                         .And(message =>
-                             {
-                                 message.Content = new StringContent("dummy request");
-                             })
+                        {
+                            message.Content = new StringContent("dummy request");
+                        })
                         .PostAsync();
 
                 var verificationResponse = await testServer
                                                    .CreateRequest($"mocks/{sessionId}/verify")
                                                    .And(msg =>
-                                                        {
-                                                            msg.Content = new StringContent("nnnn:bbbb");
-                                                        })
+                                                   {
+                                                       msg.Content = new StringContent("nnnn:bbbb");
+                                                   })
                                                    .GetAsync();
 
                 verificationResponse.StatusCode
@@ -663,33 +571,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
                 verificationResponse.Content.ReadAsStringAsync().Result
                                     .Should().Contain("not a valid JSON");
-            }
-        }
-
-        [Fact]
-        public async void Middleware_ImposterCanStubbingAResourceWithAPatternInUri()
-        {
-            SpyDataStore spyDataStore = new SpyDataStore();
-
-            using (var testServer = new TestServerBuilder()
-
-                    .UsingImposterMiddleWareWithSpyDataStore(new FakeImposterStubbingAResourceWithAPatternInUri(HttpMethod
-                                                                                                                     .Post)
-                                                                     .Build(),
-                                                             spyDataStore)
-                    .Build())
-            {
-                var response = await testServer
-                                       .CreateRequest("products/1?requestid=12344")
-                                       .And(message =>
-                                            {
-                                                message.Content =
-                                                        new StringContent("dummy request");
-                                            })
-                                       .PostAsync();
-
-                response.Content.ReadAsStringAsync().Result
-                        .Should().Be("dummy response");
             }
         }
     }

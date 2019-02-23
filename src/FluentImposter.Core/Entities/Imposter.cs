@@ -14,6 +14,7 @@ namespace FluentImposter.Core.Entities
         public string Resource { get; private set; }
         public HttpMethod Method { get; private set; }
         public IEnumerable<Rule> Rules => _rules;
+        public bool VerificationEnabled { get; private set; }
 
         internal Imposter(string name)
         {
@@ -42,6 +43,11 @@ namespace FluentImposter.Core.Entities
         internal void SetMethod(HttpMethod method)
         {
             Method = method;
+        }
+
+        public void EnableVerification()
+        {
+            VerificationEnabled = true;
         }
     }
 }

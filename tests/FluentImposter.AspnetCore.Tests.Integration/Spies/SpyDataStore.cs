@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 
 using FluentImposter.Core;
 using FluentImposter.Core.Entities;
@@ -11,7 +13,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
 {
     public class SpyDataStore: IDataStore
     {
-        private readonly IList<Requests> _requests = new List<Requests>();
+        private IList<Requests> _requests = new List<Requests>();
         internal IReadOnlyCollection<Requests> Requests => _requests.ToList();
 
         public Guid NewSessionId { get; private set; } 
@@ -50,7 +52,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             var requestId = Guid.NewGuid();
             _requests.Add(new Requests
                           {
-                              SessionId = sessionId,
                               Id = requestId,
                               Resource = resource,
                               HttpMethod = method.ToString(),
@@ -71,15 +72,26 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             return NewResponseId = Guid.NewGuid();
         }
 
-        public IEnumerable GetVerificationResponse(string resource)
+        public VerificationResponse GetVerificationResponse(string resource, HttpMethod method, byte[] requestPayload)
         {
-            return new List<VerificationResponse>
+            var storedRequest = Requests.First(r => r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase)
+                                && r.HttpMethod.Equals(method.Method.ToString(), StringComparison.OrdinalIgnoreCase)
+                                && r.RequestPayloadBase64.Equals(Convert.ToBase64String(requestPayload)));
+
+            return new VerificationResponse()
                    {
-                       new VerificationResponse()
-                       {
-                           Resource = resource
-                       }
+                       Resource = resource,
+                       RequestPayload = ASCIIEncoding.ASCII.GetString(requestPayload),
+                       InvocationCount = storedRequest.InvocationCount
                    };
+        }
+
+        public void PurgeData<T>()
+        {
+            if (typeof (T) == typeof(Requests))
+            {
+                _requests = new List<Requests>();
+            }
         }
     }
 }

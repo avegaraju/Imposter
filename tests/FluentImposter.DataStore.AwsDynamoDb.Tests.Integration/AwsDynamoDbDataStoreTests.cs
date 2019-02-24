@@ -129,19 +129,24 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         {
             var sut = CreateSut();
 
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
+
             var requestId = sut.StoreRequest("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
             Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
 
             sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
 
-            var verificationReponses = sut.GetVerificationResponse("/testResource");
+            var verificationReponses = sut.GetVerificationResponse("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
             var expectedObject = new List<VerificationResponse>
                                  {
                                      new VerificationResponse()
                                      {
-                                         Resource = "/testResource"
+                                         Resource = "/testResource",
+                                         InvocationCount = 1,
+                                         RequestPayload = "test"
                                      }
                                  };
 
@@ -150,7 +155,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
-        public void GetVerificationResponse_WhenResourceIsFoundMultipleTimes_ReturnsThoseManyVerificationResponses()
+        public void GetVerificationResponse_WhenResourceIsFoundMultipleTimes_ReturnsVerificationResponsesWithCorrectInvocationCount()
         {
             var sut = CreateSut();
 
@@ -162,19 +167,15 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
             sut.StoreResponse(requestId1, "test", expr.ToString(), "test".ToAsciiBytes());
             sut.StoreResponse(requestId2, "test", expr.ToString(), "test".ToAsciiBytes());
 
-            var verificationReponses = sut.GetVerificationResponse("/testResource");
+            var verificationReponses = sut.GetVerificationResponse("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
-            var expectedObject = new List<VerificationResponse>
-                                 {
-                                     new VerificationResponse()
-                                     {
-                                         Resource = "/testResource"
-                                     },
-                                     new VerificationResponse()
-                                     {
-                                         Resource = "/testResource"
-                                     }
-                                 };
+            var expectedObject =
+                    new VerificationResponse()
+                    {
+                        Resource = "/testResource",
+                        InvocationCount = 2,
+                        RequestPayload = "test"
+                    };
 
             verificationReponses
                     .Should().BeEquivalentTo(expectedObject);

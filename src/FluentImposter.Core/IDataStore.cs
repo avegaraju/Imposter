@@ -15,7 +15,7 @@ namespace FluentImposter.Core
                                string matchedCondition,
                                byte[] responsePayload);
 
-        IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource);
+        VerificationResponse GetVerificationResponse(string resource, HttpMethod method, byte[] requestPayload);
 
         void PurgeData<T>();
     }

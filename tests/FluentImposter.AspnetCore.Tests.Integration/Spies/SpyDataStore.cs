@@ -71,7 +71,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             return NewResponseId = Guid.NewGuid();
         }
 
-        public IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource)
+        public IEnumerable GetVerificationResponse(string resource)
         {
             return new List<VerificationResponse>
                    {

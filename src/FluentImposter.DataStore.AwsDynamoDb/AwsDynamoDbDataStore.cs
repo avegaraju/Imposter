@@ -26,72 +26,51 @@ namespace FluentImposter.DataStore.AwsDynamoDb
             InitializeSchema();
         }
 
-        public Guid CreateSession()
+        public Guid StoreRequest(string resource, HttpMethod method, byte[] requestPayload)
         {
-            var sessionId = Guid.NewGuid();
-
-            _dynamo.PutItem(new Sessions()
-                            {
-                                StartDateTime = DateTime.Now.ToUniversalTime(),
-                                Status = SessionStatus.Active.ToString(),
-                                Id = sessionId
-                            });
-
-            return sessionId;
-        }
-
-        public void EndSession(Guid sessionId)
-        {
-            if (!SessionExists(sessionId))
-                throw new SessionNotFoundException($"No session found with id {sessionId}");
-
-            _dynamo.UpdateItemNonDefaults(new Sessions()
-                                          {
-                                              Id = sessionId,
-                                              EndDateTime = DateTime.Now.ToUniversalTime(),
-                                              Status = SessionStatus.Completed.ToString()
-                                          });
-        }
-
-        public Guid StoreRequest(Guid sessionId,
-                                 string resource,
-                                 HttpMethod method,
-                                 byte[] requestPayload)
-        {
-            if (!SessionExists(sessionId))
-                throw new SessionNotFoundException($"No session found with id {sessionId}");
-
-            if(SessionAlreadyCompleted(sessionId))
-                throw new SessionNoLongerActiveException($"The session with id {sessionId} is no longer active.");
-
             var requestId = Guid.NewGuid();
 
-            var storedRequest = _dynamo.GetAll<Requests>()
-                                 .FirstOrDefault(r => r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase)
-                                                      && r.HttpMethod.Equals(method.Method.ToString(),
-                                                                             StringComparison.OrdinalIgnoreCase)
-                                                      && r.RequestPayloadBase64
-                                                          .Equals(Convert.ToBase64String(requestPayload)));
-            if(storedRequest!=null)
+            if(RequestExists(resource, method, requestPayload))
             {
+                var storedRequest = FirstOrDefaultRequest(resource, method, requestPayload);
+
                 _dynamo.UpdateItemNonDefaults(new Requests
-                                              {
-                                                  Id = storedRequest.Id,
-                                                  InvocationCount = ++storedRequest.InvocationCount
-                                              });
+                {
+                    Id = storedRequest.Id,
+                    InvocationCount = storedRequest.InvocationCount + 1
+                });
+
+                requestId = storedRequest.Id;
             }
             else
             {
                 _dynamo.PutItem(new Requests()
-                                {
-                                    HttpMethod = method.ToString(),
-                                    Id = requestId,
-                                    Resource = resource,
-                                    RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
-                                });
+                {
+                    HttpMethod = method.ToString(),
+                    Id = requestId,
+                    Resource = resource,
+                    RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
+                    InvocationCount = 1
+                });
             }
 
             return requestId;
+        }
+
+        private bool RequestExists(string resource, HttpMethod method, byte[] requestPayload)
+        {
+            return FirstOrDefaultRequest(resource, method, requestPayload) != null;
+        }
+
+        private Requests FirstOrDefaultRequest(string resource, HttpMethod method, byte[] requestPayload)
+        {
+            return _dynamo
+                    .GetAll<Requests>()
+                    .FirstOrDefault(r => r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase)
+                                         && r.HttpMethod.Equals(method.Method.ToString(),
+                                                                StringComparison.OrdinalIgnoreCase)
+                                         && r.RequestPayloadBase64
+                                             .Equals(Convert.ToBase64String(requestPayload)));
         }
 
         public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
@@ -125,6 +104,13 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                                         {
                                             Resource = v.Resource
                                         });
+        }
+
+        public void PurgeData<T>()
+        {
+            _dynamo.DeleteTable<T>();
+            _dynamo.RegisterTable<T>();
+            _dynamo.InitSchema();
         }
 
         private bool RequestExists(Guid requestId)

@@ -45,10 +45,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             EndedSessionId = guid;
         }
 
-        public Guid StoreRequest(Guid sessionId,
-                                 string resource,
-                                 HttpMethod method,
-                                 byte[] requestPayload)
+        public Guid StoreRequest(string resource, HttpMethod method, byte[] requestPayload)
         {
             var requestId = Guid.NewGuid();
             _requests.Add(new Requests

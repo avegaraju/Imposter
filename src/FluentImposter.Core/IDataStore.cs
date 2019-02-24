@@ -8,13 +8,7 @@ namespace FluentImposter.Core
 {
     public interface IDataStore
     {
-        Guid CreateSession();
-        void EndSession(Guid guid);
-
-        Guid StoreRequest(Guid sessionId,
-                                string resource,
-                                HttpMethod method,
-                                byte[] requestPayload);
+        Guid StoreRequest(string resource, HttpMethod method, byte[] requestPayload);
 
         Guid StoreResponse(Guid requestId,
                                string imposterName,
@@ -22,5 +16,7 @@ namespace FluentImposter.Core
                                byte[] responsePayload);
 
         IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource);
+
+        void PurgeData<T>();
     }
 }

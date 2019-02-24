@@ -9,5 +9,6 @@ namespace FluentImposter.Core.Models
         public string Resource { get; set; }
         public string HttpMethod { get; set; }
         public string RequestPayloadBase64 { get; set; }
+        public int InvocationCount { get; set; }
     }
 }

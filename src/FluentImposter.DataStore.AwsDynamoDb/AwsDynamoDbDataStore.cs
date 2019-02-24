@@ -66,14 +66,30 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
             var requestId = Guid.NewGuid();
 
-            _dynamo.PutItem(new Requests()
-                            {
-                                HttpMethod = method.ToString(),
-                                Id = requestId,
-                                Resource = resource,
-                                RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
-                                SessionId = sessionId
-                            });
+            var storedRequest = _dynamo.GetAll<Requests>()
+                                 .FirstOrDefault(r => r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase)
+                                                      && r.HttpMethod.Equals(method.Method.ToString(),
+                                                                             StringComparison.OrdinalIgnoreCase)
+                                                      && r.RequestPayloadBase64
+                                                          .Equals(Convert.ToBase64String(requestPayload)));
+            if(storedRequest!=null)
+            {
+                _dynamo.UpdateItemNonDefaults(new Requests
+                                              {
+                                                  Id = storedRequest.Id,
+                                                  InvocationCount = ++storedRequest.InvocationCount
+                                              });
+            }
+            else
+            {
+                _dynamo.PutItem(new Requests()
+                                {
+                                    HttpMethod = method.ToString(),
+                                    Id = requestId,
+                                    Resource = resource,
+                                    RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
+                                });
+            }
 
             return requestId;
         }

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Net.Http;
 
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 
 using FluentAssertions;
 
@@ -165,6 +166,34 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
+        public void StoreRequest_StoresTheRequestAlongWithInvocationCount()
+        {
+            var sut = CreateSut();
+
+            var sessionId = sut.CreateSession();
+
+            sut.StoreRequest(sessionId,
+                             "/test",
+                             HttpMethod.Post,
+                             "test".ToAsciiBytes());
+
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
+            var queryResult = dynamo.GetAll<Requests>().First(r => r.Resource.Equals("/test")
+                                                 && r.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase)
+                                                 && r.RequestPayloadBase64
+                                                     .Equals(Convert.ToBase64String("test".ToAsciiBytes())));
+            
+            queryResult.HttpMethod
+                   .Should().Be(HttpMethod.Post.ToString());
+            queryResult.Resource
+                   .Should().Be("/test");
+            queryResult.RequestPayloadBase64
+                   .Should().Be("test".ToAsciiBytes().ToBase64String());
+            queryResult.InvocationCount.Should().Be(1);
+        }
+
+        [Fact]
         public void StoreResponse_WithIncorrectRequestId_ThrowsException()
         {
             var sut = CreateSut();
@@ -285,6 +314,43 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
                     .SetBasePath(AppContext.BaseDirectory)
                     .AddJsonFile("appsettings.json")
                     .Build();
+        }
+
+        private Dictionary<string, Condition> BuildKeyConditions(string resource,
+            string requestPayloadBase64)
+        {
+            return new Dictionary<string, Condition>
+                   {
+                       {
+                           "Resource",
+                           new Condition
+                           {
+                               
+                               ComparisonOperator = ComparisonOperator.EQ,
+                               AttributeValueList = new List<AttributeValue>
+                                                    {
+                                                        new AttributeValue
+                                                        {
+                                                            S = resource
+                                                        }
+                                                    }
+                           }
+                       },
+                       //{
+                       //    "RequestPayloadBase64",
+                       //    new Condition
+                       //    {
+                       //        ComparisonOperator = ComparisonOperator.EQ,
+                       //        AttributeValueList = new List<AttributeValue>
+                       //                             {
+                       //                                 new AttributeValue
+                       //                                 {
+                       //                                     S = requestPayloadBase64
+                       //                                 }
+                       //                             }
+                       //    }
+                       //}
+                   };
         }
     }
 }

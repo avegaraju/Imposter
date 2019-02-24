@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Http;
@@ -571,6 +572,38 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
                 verificationResponse.Content.ReadAsStringAsync().Result
                                     .Should().Contain("not a valid JSON");
+            }
+        }
+
+        [Fact]
+        public async void Middleware_WithVerificationEnabledImposter_SavesTheRequestAndInvocationCountInDataStore()
+        {
+            var requestContent = "dummy request";
+            var spyDataStore = new SpyDataStore();
+            var fakeImposter
+                    = new FakeImposterWithMockedRequestContent(HttpMethod.Post)
+                            .Build();
+
+            using (var testServer = new TestServerBuilder()
+
+                    .UsingImposterMiddleWareWithSpyDataStore(fakeImposter,
+                                                             spyDataStore)
+                    .Build())
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    await testServer
+                            .CreateRequest($"{fakeImposter.Resource}")
+                            .And(message =>
+                                 {
+                                     message.Content = new StringContent("dummy request");
+                                 })
+                            .PostAsync();
+                }
+
+                spyDataStore.Requests.Should().HaveCount(2);
+                Encoding.UTF8.GetString(Convert.FromBase64String(spyDataStore.Requests.First().RequestPayloadBase64))
+                        .Should().Be(requestContent);
             }
         }
     }

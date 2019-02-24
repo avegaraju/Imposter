@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 
 using FluentImposter.Core;
 using FluentImposter.Core.Entities;
+using FluentImposter.Core.Models;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Spies
 {
     public class SpyDataStore: IDataStore
     {
+        private readonly IList<Requests> _requests = new List<Requests>();
+        internal IReadOnlyCollection<Requests> Requests => _requests.ToList();
+
         public Guid NewSessionId { get; private set; } 
         public Guid EndedSessionId { get; private set; }
         public Guid SessionIdReceivedWithRequest { get; private set; }
@@ -21,6 +26,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
         public string MatchedCondition { get; set; }
         public string ImposterName { get; set; }
         public byte[] ResponsePayload { get; set; }
+        
 
         public SpyDataStore()
         {
@@ -39,14 +45,22 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             EndedSessionId = guid;
         }
 
-        public Guid StoreRequest(Guid sessionId, string resource, HttpMethod method, byte[] requestPayload)
+        public Guid StoreRequest(Guid sessionId,
+                                 string resource,
+                                 HttpMethod method,
+                                 byte[] requestPayload)
         {
-            SessionIdReceivedWithRequest = sessionId;
-            RequestedResource = resource;
-            HttpMethod = method.ToString();
-            RequestPayload = requestPayload;
+            var requestId = Guid.NewGuid();
+            _requests.Add(new Requests
+                          {
+                              SessionId = sessionId,
+                              Id = requestId,
+                              Resource = resource,
+                              HttpMethod = method.ToString(),
+                              RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
+                          });
 
-            return NewRequestId = Guid.NewGuid();
+            return requestId;
         }
 
         public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)

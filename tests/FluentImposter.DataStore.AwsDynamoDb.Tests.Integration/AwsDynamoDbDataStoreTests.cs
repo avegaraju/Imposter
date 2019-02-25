@@ -88,6 +88,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void StoreResponse_WithIncorrectRequestId_ThrowsException()
         {
             var sut = CreateSut();
@@ -100,9 +101,13 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void StoreResponse_WithValidRequestId_StoresResponse()
         {
             var sut = CreateSut();
+
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
 
             var requestId = sut.StoreRequest("/test", HttpMethod.Get, "test".ToAsciiBytes());
 
@@ -112,7 +117,8 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
-            var response = dynamo.GetItem<Responses>(requestId.ToString());
+            var response = dynamo.Scan<Responses>(new ScanRequest("Responses"))
+                                 .First(r => r.RequestId == requestId);
 
             response.ImposterName
                     .Should().Be("test");
@@ -125,6 +131,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void GetVerificationResponse_WhenResourceIsFound_ReturnsVerificationResponses()
         {
             var sut = CreateSut();
@@ -140,24 +147,26 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             var verificationReponses = sut.GetVerificationResponse("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
-            var expectedObject = new List<VerificationResponse>
-                                 {
-                                     new VerificationResponse()
-                                     {
-                                         Resource = "/testResource",
-                                         InvocationCount = 1,
-                                         RequestPayload = "test"
-                                     }
-                                 };
+            var expectedObject =
+                    new VerificationResponse()
+                    {
+                        Resource = "/testResource",
+                        InvocationCount = 1,
+                        RequestPayload = "test"
+                    };
 
             verificationReponses
                     .Should().BeEquivalentTo(expectedObject);
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void GetVerificationResponse_WhenResourceIsFoundMultipleTimes_ReturnsVerificationResponsesWithCorrectInvocationCount()
         {
             var sut = CreateSut();
+
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
 
             var requestId1 = sut.StoreRequest("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
             var requestId2 = sut.StoreRequest("/testResource", HttpMethod.Get, "test".ToAsciiBytes());

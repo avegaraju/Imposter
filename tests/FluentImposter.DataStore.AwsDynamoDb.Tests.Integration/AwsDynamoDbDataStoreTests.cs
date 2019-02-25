@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Net.Http;
 
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 
 using FluentAssertions;
 
@@ -45,9 +46,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         [Trait("Category", "DynamoDb")]
         public void CreatesTables_WhenNoTablesExists_CanCreateSchemaInLocalDynamoDbInstance()
         {
-            AwsDynamoDbDataStore sut = CreateSut();
-
-            sut.CreateSession();
+            CreateSut();
 
             var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
@@ -63,108 +62,33 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
         [Fact]
         [Trait("Category", "DynamoDb")]
-        public void CreateSession_CanCreateASession()
-        {
-            AwsDynamoDbDataStore sut = CreateSut();
-
-            var sessionId = sut.CreateSession();
-
-
-            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
-
-            dynamo.GetItem<Sessions>(sessionId.ToString()).Id
-                      .Should().Be(sessionId);
-        }
-
-        [Fact]
-        [Trait("Category", "DynamoDb")]
-        public void EndSession_CanEndASession()
-        {
-            AwsDynamoDbDataStore sut = CreateSut();
-
-            var sessionId = sut.CreateSession();
-
-            sut.EndSession(sessionId);
-
-            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
-
-            var sessionInstance = dynamo.GetItem<Sessions>(sessionId.ToString());
-
-            sessionInstance.EndDateTime
-                           .Should().BeCloseTo(DateTime.Now.ToUniversalTime(), 10000);
-            sessionInstance.Status
-                           .Should().Be(SessionStatus.Completed.ToString());
-        }
-
-        [Fact]
-        [Trait("Category", "DynamoDb")]
-        public void EndSession_WithIncorrectSessionId_ThrowsSessionNotFoundException()
-        {
-            AwsDynamoDbDataStore sut = CreateSut();
-
-            sut.CreateSession();
-
-            Action exceptionAction = () => sut.EndSession(Guid.NewGuid());
-
-            exceptionAction.Should().Throw<SessionNotFoundException>();
-        }
-
-        [Fact]
-        [Trait("Category", "DynamoDb")]
-        public void StoreRequest_WithNonExistingSessionId_ThrowsException()
-        {
-            Action exceptionThrowingAction
-                    = () => CreateSut()
-                              .StoreRequest(Guid.NewGuid(), "/", HttpMethod.Post, null);
-
-            exceptionThrowingAction.Should().Throw<SessionNotFoundException>();
-        }
-
-        [Fact]
-        [Trait("Category", "DynamoDb")]
-        public void StoreRequest_WithAnAlreadyCompletedSessionId_ThrowsException()
+        public void StoreRequest_StoresTheRequestAlongWithInvocationCount()
         {
             var sut = CreateSut();
 
-            var sessionId = sut.CreateSession();
-            sut.EndSession(sessionId);
+            sut.PurgeData<Requests>();
 
-            Action exceptionThrowingAction
-                    = () => sut
-                              .StoreRequest(sessionId, "/", HttpMethod.Post, null);
-
-            exceptionThrowingAction
-                .Should().Throw<SessionNoLongerActiveException>();
-        }
-
-        [Fact]
-        [Trait("Category", "DynamoDb")]
-        public void StoreRequest_WithAnActiveSessionId_StoresTheRequest()
-        {
-            var sut = CreateSut();
-
-            var sessionId = sut.CreateSession();
-
-            var requestId = sut.StoreRequest(sessionId,
-                                             "/test",
-                                             HttpMethod.Post,
-                                             "test".ToAsciiBytes());
+            sut.StoreRequest("/test",
+                             HttpMethod.Post,
+                             "test".ToAsciiBytes());
 
             var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
-
-            var request = dynamo.GetItem<Requests>(requestId.ToString());
-
-            request.HttpMethod
+            var queryResult = dynamo.GetAll<Requests>().First(r => r.Resource.Equals("/test")
+                                                 && r.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase)
+                                                 && r.RequestPayloadBase64
+                                                     .Equals(Convert.ToBase64String("test".ToAsciiBytes())));
+            
+            queryResult.HttpMethod
                    .Should().Be(HttpMethod.Post.ToString());
-            request.Resource
+            queryResult.Resource
                    .Should().Be("/test");
-            request.SessionId
-                   .Should().Be(sessionId);
-            request.RequestPayloadBase64
+            queryResult.RequestPayloadBase64
                    .Should().Be("test".ToAsciiBytes().ToBase64String());
+            queryResult.InvocationCount.Should().Be(1);
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void StoreResponse_WithIncorrectRequestId_ThrowsException()
         {
             var sut = CreateSut();
@@ -177,20 +101,24 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void StoreResponse_WithValidRequestId_StoresResponse()
         {
             var sut = CreateSut();
 
-            var sessionId = sut.CreateSession();
-            var requestId = sut.StoreRequest(sessionId, "/test", HttpMethod.Get, "test".ToAsciiBytes());
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
+
+            var requestId = sut.StoreRequest("/test", HttpMethod.Get, "test".ToAsciiBytes());
 
             Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
 
-            var responseId = sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
+            sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
 
             var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
-            var response = dynamo.GetItem<Responses>(responseId.ToString());
+            var response = dynamo.Scan<Responses>(new ScanRequest("Responses"))
+                                 .First(r => r.RequestId == requestId);
 
             response.ImposterName
                     .Should().Be("test");
@@ -203,58 +131,60 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         }
 
         [Fact]
+        [Trait("Category", "DynamoDb")]
         public void GetVerificationResponse_WhenResourceIsFound_ReturnsVerificationResponses()
         {
             var sut = CreateSut();
 
-            var sessionId = sut.CreateSession();
-            var requestId = sut.StoreRequest(sessionId, "/testResource", HttpMethod.Get, "test".ToAsciiBytes());
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
+
+            var requestId = sut.StoreRequest("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
             Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
 
             sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
 
-            var verificationReponses = sut.GetVerificationResponse(sessionId, "/testResource");
+            var verificationReponses = sut.GetVerificationResponse("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
-            var expectedObject = new List<VerificationResponse>
-                                 {
-                                     new VerificationResponse()
-                                     {
-                                         Resource = "/testResource"
-                                     }
-                                 };
+            var expectedObject =
+                    new VerificationResponse()
+                    {
+                        Resource = "/testResource",
+                        InvocationCount = 1,
+                        RequestPayload = "test"
+                    };
 
             verificationReponses
                     .Should().BeEquivalentTo(expectedObject);
         }
 
         [Fact]
-        public void GetVerificationResponse_WhenResourceIsFoundMultipleTimes_ReturnsThoseManyVerificationResponses()
+        [Trait("Category", "DynamoDb")]
+        public void GetVerificationResponse_WhenResourceIsFoundMultipleTimes_ReturnsVerificationResponsesWithCorrectInvocationCount()
         {
             var sut = CreateSut();
 
-            var sessionId = sut.CreateSession();
-            var requestId1 = sut.StoreRequest(sessionId, "/testResource", HttpMethod.Get, "test".ToAsciiBytes());
-            var requestId2 = sut.StoreRequest(sessionId, "/testResource", HttpMethod.Get, "test".ToAsciiBytes());
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
+
+            var requestId1 = sut.StoreRequest("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
+            var requestId2 = sut.StoreRequest("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
             Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
 
             sut.StoreResponse(requestId1, "test", expr.ToString(), "test".ToAsciiBytes());
             sut.StoreResponse(requestId2, "test", expr.ToString(), "test".ToAsciiBytes());
 
-            var verificationReponses = sut.GetVerificationResponse(sessionId, "/testResource");
+            var verificationReponses = sut.GetVerificationResponse("/testResource", HttpMethod.Get, "test".ToAsciiBytes());
 
-            var expectedObject = new List<VerificationResponse>
-                                 {
-                                     new VerificationResponse()
-                                     {
-                                         Resource = "/testResource"
-                                     },
-                                     new VerificationResponse()
-                                     {
-                                         Resource = "/testResource"
-                                     }
-                                 };
+            var expectedObject =
+                    new VerificationResponse()
+                    {
+                        Resource = "/testResource",
+                        InvocationCount = 2,
+                        RequestPayload = "test"
+                    };
 
             verificationReponses
                     .Should().BeEquivalentTo(expectedObject);

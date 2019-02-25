@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,7 +23,6 @@ namespace FluentImposter.AspnetCore
     public class MockingRouteCreator: RouteCreatorBase,
                                       IRouteCreator<IApplicationBuilder>
     {
-        private static Guid _currentSession = Guid.Empty;
         private readonly ImpostersAsMockConfiguration _configuration;
         private readonly ImposterRulesEvaluator _rulesEvaluator;
 
@@ -78,7 +78,6 @@ namespace FluentImposter.AspnetCore
                               {
                                   Content = streamReader.ReadToEnd(),
                                   RequestHeader = BuildRequestHeader(),
-                                  SessionId = _currentSession
                               };
 
                 return request;
@@ -102,8 +101,7 @@ namespace FluentImposter.AspnetCore
                                              Response response,
                                              Expression<Func<Request, bool>> matchedCondition)
         {
-            var requestId = _configuration.DataStore.StoreRequest(_currentSession,
-                                                                  imposter.Resource,
+            var requestId = _configuration.DataStore.StoreRequest(imposter.Resource,
                                                                   imposter.Method,
                                                                   Encoding.ASCII.GetBytes(request.Content));
 
@@ -118,46 +116,19 @@ namespace FluentImposter.AspnetCore
             applicationBuilder
                     .UseRouter(routeBuilder =>
                                {
-                                   routeBuilder.MapVerb("Post",
-                                                        "mocks/session",
-                                                        CreateMockingSessionRequestHandler());
-
                                    routeBuilder.MapVerb("Get",
-                                                        "mocks/{sessionId}/verify",
+                                                        "mocks/verify",
                                                         VerifyMockingRequestHandler());
                                });
-        }
-
-        private RequestDelegate CreateMockingSessionRequestHandler()
-        {
-            return async context =>
-                   {
-                       await CreateNewMockingSession(context);
-                   };
-        }
-
-        private async Task CreateNewMockingSession(HttpContext context)
-        {
-            if (ActiveSessionExists)
-                _configuration.DataStore.EndSession(_currentSession);
-
-            _currentSession = _configuration.DataStore.CreateSession();
-
-            context.Response.StatusCode =
-                    (int)HttpStatusCode.Created;
-            await context.Response.WriteAsync(_currentSession.ToString());
         }
 
         private RequestDelegate VerifyMockingRequestHandler()
         {
             return async context =>
                    {
-                       if (ActiveSessionExists)
-                           _configuration.DataStore.EndSession(_currentSession);
-
                        try
                        {
-                           var verificationResponses = GetVerificationResponses(context);
+                           var verificationResponses = GetVerificationResponse(context);
 
                            context.Response.StatusCode = (int)HttpStatusCode.OK;
 
@@ -176,30 +147,19 @@ namespace FluentImposter.AspnetCore
                        }
                    };
 
-            IEnumerable<VerificationResponse> GetVerificationResponses(HttpContext context)
+            VerificationResponse GetVerificationResponse(HttpContext context)
             {
-                var sessionId = GetSessionIdFromUri(context);
-                var resource = GetResourceFromBody(context);
+                var verificationRequest = GetVerificationRequest(context);
 
-                return _configuration.DataStore.GetVerificationResponse(Guid.Parse(sessionId), resource);
+                return _configuration.DataStore.GetVerificationResponse(verificationRequest.Resource,
+                                                                        new HttpMethod(verificationRequest.HttpMethod),
+                                                                        Encoding
+                                                                                .ASCII
+                                                                                .GetBytes(verificationRequest
+                                                                                                  .RequestPayload));
             }
 
-            string GetSessionIdFromUri(HttpContext context)
-            {
-                var path = context.Request.Path.Value;
-
-                var startIndex = "/mocks/".Length;
-                var endIndex = path.LastIndexOf("/verify", StringComparison.Ordinal) - "/verify".Length;
-
-                var sessionId = path.Substring(startIndex, endIndex);
-
-                if (!Guid.TryParse(sessionId, out _))
-                    throw new InvalidSessionIdInUriException($"{sessionId} is not a valid session Id.");
-
-                return sessionId;
-            }
-
-            string GetResourceFromBody(HttpContext context)
+            VerificationRequest GetVerificationRequest(HttpContext context)
             {
                 using (StreamReader streamReader = new StreamReader(context.Request.Body))
                 {
@@ -208,8 +168,7 @@ namespace FluentImposter.AspnetCore
                     try
                     {
                         return JsonConvert
-                                .DeserializeObject<VerificationRequest>(body)
-                                .Resource;
+                                .DeserializeObject<VerificationRequest>(body);
                     }
                     catch (JsonReaderException e)
                     {
@@ -219,7 +178,5 @@ namespace FluentImposter.AspnetCore
                 }
             }
         }
-
-        private static bool ActiveSessionExists => _currentSession != Guid.Empty;
     }
 }

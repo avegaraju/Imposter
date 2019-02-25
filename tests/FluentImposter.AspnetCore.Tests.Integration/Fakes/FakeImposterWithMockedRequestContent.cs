@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 
+using FluentImposter.Core;
 using FluentImposter.Core.Entities;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
@@ -12,10 +13,12 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         {
             _httpMethod = httpMethod;
         }
+
         public Imposter Build()
         {
             return new ImposterDefinition("test")
                     .DeclareResource("test", _httpMethod)
+                    .WithVerificationEnabled()
                     .When(r => r.Content.Contains("dummy"))
                     .Then(new DummyResponseCreator())
                     .Build();

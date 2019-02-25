@@ -259,7 +259,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationBuilderExtensionTests.cs" />
+    <Compile Include="ApplicationBuilderExtensionMockTests.cs" />
+    <Compile Include="ApplicationBuilderExtensionStubTests.cs" />
     <Compile Include="Fakes\FakeImposterStubbingAResourceWithAPatternInUri.cs" />
     <Compile Include="Fakes\FakeImposterWithMockedRequestContent.cs" />
     <Compile Include="Fakes\FakeImposterWithRequestContent.cs" />

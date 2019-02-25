@@ -1,17 +1,24 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 
 using FluentImposter.Core;
 using FluentImposter.Core.Entities;
+using FluentImposter.Core.Models;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Spies
 {
     public class SpyDataStore: IDataStore
     {
-        public Guid NewSessionId { get; private set; } 
-        public Guid EndedSessionId { get; private set; }
-        public Guid SessionIdReceivedWithRequest { get; private set; }
+        private IList<Requests> _requests = new List<Requests>();
+        private IList<Responses> _responses = new List<Responses>();
+
+        internal IReadOnlyCollection<Requests> Requests => _requests.ToList();
+        internal IReadOnlyCollection<Responses> Responses => _responses.ToList();
+
         public Guid NewRequestId { get; set; }
         public string RequestedResource { get; set; }
         public string HttpMethod { get; set; }
@@ -22,53 +29,54 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
         public string ImposterName { get; set; }
         public byte[] ResponsePayload { get; set; }
 
-        public SpyDataStore()
+        public Guid StoreRequest(string resource, HttpMethod method, byte[] requestPayload)
         {
-            NewSessionId = Guid.Empty;
+            var requestId = Guid.NewGuid();
+            _requests.Add(new Requests
+                          {
+                              Id = requestId,
+                              Resource = resource,
+                              HttpMethod = method.ToString(),
+                              RequestPayloadBase64 = Convert.ToBase64String(requestPayload),
+                          });
+
+            return requestId;
         }
 
-        public Guid CreateSession()
+        public void StoreResponse(Guid requestId,
+                                  string imposterName,
+                                  string matchedCondition,
+                                  byte[] responsePayload)
         {
-            NewSessionId = Guid.NewGuid();
-
-            return NewSessionId;
+            _responses.Add(new Responses
+                           {
+                               RequestId = requestId,
+                               ResponsePayloadBase64 = Convert.ToBase64String(responsePayload),
+                               ImposterName = imposterName,
+                               MatchedCondition = matchedCondition
+                           });
         }
 
-        public void EndSession(Guid guid)
+        public VerificationResponse GetVerificationResponse(string resource, HttpMethod method, byte[] requestPayload)
         {
-            EndedSessionId = guid;
-        }
+            var storedRequest = Requests.First(r => r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase)
+                                && r.HttpMethod.Equals(method.Method.ToString(), StringComparison.OrdinalIgnoreCase)
+                                && r.RequestPayloadBase64.Equals(Convert.ToBase64String(requestPayload)));
 
-        public Guid StoreRequest(Guid sessionId, string resource, HttpMethod method, byte[] requestPayload)
-        {
-            SessionIdReceivedWithRequest = sessionId;
-            RequestedResource = resource;
-            HttpMethod = method.ToString();
-            RequestPayload = requestPayload;
-
-            return NewRequestId = Guid.NewGuid();
-        }
-
-        public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
-        {
-            RequestIdReceivedWhileStoringResponse = requestId;
-
-            MatchedCondition = matchedCondition;
-            ImposterName = imposterName;
-            ResponsePayload = responsePayload;
-
-            return NewResponseId = Guid.NewGuid();
-        }
-
-        public IEnumerable<VerificationResponse> GetVerificationResponse(Guid sessionId, string resource)
-        {
-            return new List<VerificationResponse>
+            return new VerificationResponse()
                    {
-                       new VerificationResponse()
-                       {
-                           Resource = resource
-                       }
+                       Resource = resource,
+                       RequestPayload = Encoding.ASCII.GetString(requestPayload),
+                       InvocationCount = storedRequest.InvocationCount
                    };
+        }
+
+        public void PurgeData<T>()
+        {
+            if (typeof (T) == typeof(Requests))
+            {
+                _requests = new List<Requests>();
+            }
         }
     }
 }

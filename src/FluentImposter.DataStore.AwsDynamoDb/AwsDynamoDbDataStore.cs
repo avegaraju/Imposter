@@ -58,7 +58,7 @@ namespace FluentImposter.DataStore.AwsDynamoDb
             return requestId;
         }
 
-        public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
+        public void StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
         {
             if (!RequestExists(requestId))
                 throw new RequestDoesNotExistException($"Request with id {requestId} does not exist.");
@@ -72,8 +72,6 @@ namespace FluentImposter.DataStore.AwsDynamoDb
                                 RequestId = requestId,
                                 ResponsePayloadBase64 = Convert.ToBase64String(responsePayload)
                             });
-
-            return responseId;
         }
 
         public VerificationResponse GetVerificationResponse(string resource, HttpMethod method, byte[] requestPayload)

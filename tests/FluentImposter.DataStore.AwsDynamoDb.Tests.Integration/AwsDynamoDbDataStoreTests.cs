@@ -108,11 +108,11 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
             Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
 
-            var responseId = sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
+            sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
 
             var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
 
-            var response = dynamo.GetItem<Responses>(responseId.ToString());
+            var response = dynamo.GetItem<Responses>(requestId.ToString());
 
             response.ImposterName
                     .Should().Be("test");

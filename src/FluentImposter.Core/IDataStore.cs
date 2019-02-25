@@ -9,7 +9,7 @@ namespace FluentImposter.Core
     {
         Guid StoreRequest(string resource, HttpMethod method, byte[] requestPayload);
 
-        Guid StoreResponse(Guid requestId,
+        void StoreResponse(Guid requestId,
                                string imposterName,
                                string matchedCondition,
                                byte[] responsePayload);

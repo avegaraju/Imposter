@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -116,7 +117,7 @@ namespace FluentImposter.AspnetCore
                     .UseRouter(routeBuilder =>
                                {
                                    routeBuilder.MapVerb("Get",
-                                                        "mocks/{sessionId}/verify",
+                                                        "mocks/verify",
                                                         VerifyMockingRequestHandler());
                                });
         }
@@ -151,7 +152,7 @@ namespace FluentImposter.AspnetCore
                 var verificationRequest = GetVerificationRequest(context);
 
                 return _configuration.DataStore.GetVerificationResponse(verificationRequest.Resource,
-                                                                        verificationRequest.HttpMethod,
+                                                                        new HttpMethod(verificationRequest.HttpMethod),
                                                                         Encoding
                                                                                 .ASCII
                                                                                 .GetBytes(verificationRequest

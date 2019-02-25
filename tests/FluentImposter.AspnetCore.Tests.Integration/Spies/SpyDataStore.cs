@@ -14,11 +14,11 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
     public class SpyDataStore: IDataStore
     {
         private IList<Requests> _requests = new List<Requests>();
-        internal IReadOnlyCollection<Requests> Requests => _requests.ToList();
+        private IList<Responses> _responses = new List<Responses>();
 
-        public Guid NewSessionId { get; private set; } 
-        public Guid EndedSessionId { get; private set; }
-        public Guid SessionIdReceivedWithRequest { get; private set; }
+        internal IReadOnlyCollection<Requests> Requests => _requests.ToList();
+        internal IReadOnlyCollection<Responses> Responses => _responses.ToList();
+
         public Guid NewRequestId { get; set; }
         public string RequestedResource { get; set; }
         public string HttpMethod { get; set; }
@@ -28,24 +28,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
         public string MatchedCondition { get; set; }
         public string ImposterName { get; set; }
         public byte[] ResponsePayload { get; set; }
-        
-
-        public SpyDataStore()
-        {
-            NewSessionId = Guid.Empty;
-        }
-
-        public Guid CreateSession()
-        {
-            NewSessionId = Guid.NewGuid();
-
-            return NewSessionId;
-        }
-
-        public void EndSession(Guid guid)
-        {
-            EndedSessionId = guid;
-        }
 
         public Guid StoreRequest(string resource, HttpMethod method, byte[] requestPayload)
         {
@@ -61,15 +43,18 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             return requestId;
         }
 
-        public Guid StoreResponse(Guid requestId, string imposterName, string matchedCondition, byte[] responsePayload)
+        public void StoreResponse(Guid requestId,
+                                  string imposterName,
+                                  string matchedCondition,
+                                  byte[] responsePayload)
         {
-            RequestIdReceivedWhileStoringResponse = requestId;
-
-            MatchedCondition = matchedCondition;
-            ImposterName = imposterName;
-            ResponsePayload = responsePayload;
-
-            return NewResponseId = Guid.NewGuid();
+            _responses.Add(new Responses
+                           {
+                               RequestId = requestId,
+                               ResponsePayloadBase64 = Convert.ToBase64String(responsePayload),
+                               ImposterName = imposterName,
+                               MatchedCondition = matchedCondition
+                           });
         }
 
         public VerificationResponse GetVerificationResponse(string resource, HttpMethod method, byte[] requestPayload)
@@ -81,7 +66,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Spies
             return new VerificationResponse()
                    {
                        Resource = resource,
-                       RequestPayload = ASCIIEncoding.ASCII.GetString(requestPayload),
+                       RequestPayload = Encoding.ASCII.GetString(requestPayload),
                        InvocationCount = storedRequest.InvocationCount
                    };
         }

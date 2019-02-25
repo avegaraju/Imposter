@@ -44,13 +44,13 @@ namespace ImpostersServiceSample
 
             /*Uncomment below code when DynamoDB is available on http://localhost:8000*/
 
-            ImpostersAsMockConfiguration mockConfiguration =
-                    new ImpostersAsMockConfiguration(new MockImpostersBuilder()
-                                                             .CreateMockImposters(),
-                                                     new MocksDataStore()
-                                                             .Create());
+            //ImpostersAsMockConfiguration mockConfiguration =
+            //        new ImpostersAsMockConfiguration(new MockImpostersBuilder()
+            //                                                 .CreateMockImposters(),
+            //                                         new MocksDataStore()
+            //                                                 .Create());
 
-            app.UseMockImposters(mockConfiguration);
+            //app.UseMockImposters(mockConfiguration);
 
             app.UseMvc();
         }

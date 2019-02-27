@@ -132,6 +132,29 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
 
         [Fact]
         [Trait("Category", "DynamoDb")]
+        public void StoreResponse_WhenAResponsesForARequestAlreadyExists_DoesNotStoreResponseAgain()
+        {
+            var sut = CreateSut();
+
+            sut.PurgeData<Requests>();
+            sut.PurgeData<Responses>();
+
+            var requestId = sut.StoreRequest("/test", HttpMethod.Get, "test".ToAsciiBytes());
+
+            Expression<Func<Request, bool>> expr = r => r.Content.Contains("test");
+
+            sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
+            sut.StoreResponse(requestId, "test", expr.ToString(), "test".ToAsciiBytes());
+
+            var dynamo = new PocoDynamo(CreateAmazonDynamoDbClientWithLocalDbInstance());
+
+            dynamo.Scan<Responses>(new ScanRequest("Responses"))
+                  .Count(responses => responses.RequestId == requestId)
+                  .Should().Be(1);
+        }
+
+        [Fact]
+        [Trait("Category", "DynamoDb")]
         public void GetVerificationResponse_WhenResourceIsFound_ReturnsVerificationResponses()
         {
             var sut = CreateSut();

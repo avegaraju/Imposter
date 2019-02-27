@@ -128,13 +128,14 @@ namespace FluentImposter.DataStore.AwsDynamoDb
 
         private Requests FirstOrDefaultRequest(string resource, HttpMethod method, byte[] requestPayload)
         {
-            return _dynamo
-                    .GetAll<Requests>()
+            var requests = _dynamo
+                    .GetAll<Requests>().ToList();
+            return requests
                     .FirstOrDefault(r => r.Resource.Equals(resource, StringComparison.OrdinalIgnoreCase)
                                          && r.HttpMethod.Equals(method.Method.ToString(),
-                                                                StringComparison.OrdinalIgnoreCase)
-                                         && r.RequestPayloadBase64
-                                             .Equals(Convert.ToBase64String(requestPayload)));
+                                                                StringComparison.OrdinalIgnoreCase));
+            //&& r.RequestPayloadBase64
+            //    .Equals(Convert.ToBase64String(requestPayload)));
         }
 
         public enum SessionStatus

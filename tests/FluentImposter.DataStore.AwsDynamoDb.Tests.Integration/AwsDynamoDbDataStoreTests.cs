@@ -202,7 +202,8 @@ namespace FluentImposter.DataStore.AwsDynamoDb.Tests.Integration
         {
             var config = new AmazonDynamoDBConfig
             {
-                ServiceURL = "http://localhost:8000"
+                //For tests to work. Host local dynamodb at port 8001
+                ServiceURL = "http://localhost:8001"
             };
 
             var client = new AmazonDynamoDBClient(config);

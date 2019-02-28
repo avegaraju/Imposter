@@ -42,7 +42,7 @@ namespace ImpostersServiceSample
 
             app.UseStubImposters(stubConfiguration);
 
-            /*Uncomment below code when DynamoDB is available on http://localhost:8000*/
+            /*Uncomment below code when DynamoDB is available at http://localhost:8000*/
 
             //ImpostersAsMockConfiguration mockConfiguration =
             //        new ImpostersAsMockConfiguration(new MockImpostersBuilder()

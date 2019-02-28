@@ -101,20 +101,6 @@ namespace FluentImposter.Core.Tests.Unit
                     .Should().BeEquivalentTo(expectedAction.CreateResponse());
         }
 
-        [Fact]
-        public void ImposterDefinition_AllowsToEnableVerification()
-        {
-            ImposterDefinition imposterDefinition = CreateSut();
-
-            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
-                                             .WithVerificationEnabled()
-                                             .When(r => r.Content.Contains(""))
-                                             .Then(new DefaultResponseCreator())
-                                             .Build();
-
-            imposter.VerificationEnabled.Should().BeTrue();
-        }
-
         private static ImposterDefinition CreateSut()
         {
             return new ImposterDefinition("test");

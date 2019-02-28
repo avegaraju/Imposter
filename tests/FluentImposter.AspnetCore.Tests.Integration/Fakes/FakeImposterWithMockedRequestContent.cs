@@ -18,7 +18,6 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         {
             return new ImposterDefinition("test")
                     .DeclareResource("test", _httpMethod)
-                    .WithVerificationEnabled()
                     .When(r => r.Content.Contains("dummy"))
                     .Then(new DummyResponseCreator())
                     .Build();

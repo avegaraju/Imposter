@@ -14,13 +14,6 @@ namespace FluentImposter.Core.Builders
             _imposter = imposter;
         }
 
-        public ImposterRule WithVerificationEnabled()
-        {
-            _imposter.EnableVerification();
-
-            return this;
-        }
-
         public ImposterRuleAction When(Expression<Func<Request, bool>> condition)
         {
             _imposter.CreateRuleCondition(condition);

@@ -67,9 +67,9 @@ public class FailedToCreateCustomerResponseCreator : IResponseCreator
         }
 }
 
-The ```ResponseBuilder``` will help you build the ```Response```.
+The `ResponseBuilder` will help you build the `Response`.
 
-            Use the Imposter
+* Use the Imposter
 
 
 ```
@@ -97,14 +97,17 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
             //app.UseMockImposters(mockConfiguration);
 }
 
+```
 As simple as that. ```ImpostersAsStubConfiguration ``` accepts an array of Imposters and ```UseStubImposters``` extension method of ```IApplicationBuilder``` accpets the ```ImpostersAsStubConfiguration ``` to host the imposters as REST resources.
 
 Apart from the above, you need to call ```AddRouting``` on the ```IServiceCollection``` instance as shown below. The reason, you'd need to do that is because the imposter middleware creates and add ```Routes``` for each imposter REST resource. Without adding routing, imposters will not be able to receive requests from the client.
 
+```
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddRouting();
 }
+```
 
 
 To get started, refer to the documentation in [![wiki](https://github.com/avegaraju/Imposter/wiki/Getting-Started)]

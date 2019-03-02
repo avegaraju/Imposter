@@ -4,13 +4,15 @@ Project Imposter provides simple test doubles over the wire. It is easy to setup
 
 
 Imposter  package can be referenced from Nuget. Configure Nuget as your package source and install the package.
-
+```
 Install-Package Appify.FluentImposter.AspnetCore
+```
 
 Currently, the package supports AspnetCore projects only.
 
 As a first step, Create a .Net Core console application and build the WebHost.
 
+```
 static void Main(string[] args)
 {
     var host =  WebHost.CreateDefaultBuilder(args)
@@ -23,15 +25,17 @@ static void Main(string[] args)
 
     Console.ReadLine();
 }
+```
 
 This will create a base Url for the imposters.
 
-            Create your first Imposter
+* Create your first Imposter
 
 Creating an Imposter is easy. Just create a class and implement ```IImposter``` interface.
 
 For example, below imposter would stub the REST resource which creates a user.
 
+```
 public class CustomerImposter: IImposter
 {
         public Imposter Build()
@@ -43,15 +47,17 @@ public class CustomerImposter: IImposter
                     .Build();
         }
 }
+```
 
 The Fluent Api helps to build an imposter easily. In this case, an imposter with name ```CreateUserStub``` is being built, which stubs a REST resource ```http://localhost:5000/users``` and accepts ```Post``` requests.
 
 You can define conditions when this imposter should be invoked. In this case, when the request body contains an email address ```abc@xyz.com``` then this imposter will be invoked and will respond with a fake response.
 
-                Creating fake response.
+* Creating fake response.
 
 Fake responses are easy to create. Just Create a class and implement ```IResponseCreator``` interface as shown below.
 
+```
 public class FailedToCreateCustomerResponseCreator : IResponseCreator
 {
         public Response CreateResponse()
@@ -66,6 +72,7 @@ public class FailedToCreateCustomerResponseCreator : IResponseCreator
                                         .Build();
         }
 }
+```
 
 The `ResponseBuilder` will help you build the `Response`.
 

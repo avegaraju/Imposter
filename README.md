@@ -110,4 +110,3 @@ public void ConfigureServices(IServiceCollection services)
 ```
 
 
-To get started, refer to the documentation in [![wiki](https://github.com/avegaraju/Imposter/wiki/Getting-Started)]

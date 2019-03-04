@@ -49,7 +49,7 @@ public class CustomerImposter: IImposter
 }
 ```
 
-The Fluent Api helps to build an imposter easily. In this case, an imposter with name ```CreateUserStub``` is being built, which stubs a REST resource ```http://localhost:5000/users``` and accepts ```Post``` requests.
+The Fluent Api helps to build an imposter easily. In this case, an imposter with name ```CustomersStub``` is being built, which stubs a REST resource ```http://localhost:5000/api/Customers``` and accepts ```Post``` requests.
 
 You can define conditions when this imposter should be invoked. In this case, when the request body contains an email address ```abc@xyz.com``` then this imposter will be invoked and will respond with a fake response.
 

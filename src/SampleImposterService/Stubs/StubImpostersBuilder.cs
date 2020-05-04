@@ -5,6 +5,7 @@ using FluentImposter.Core.Entities;
 
 using ImpostersServiceSample.Stubs.Customers;
 using ImpostersServiceSample.Stubs.Orders;
+using ImpostersServiceSample.Stubs.PurchaseOrders;
 
 namespace ImpostersServiceSample.Stubs
 {
@@ -16,6 +17,7 @@ namespace ImpostersServiceSample.Stubs
         {
             _imposters.Add(new OrdersImposter().Build());
             _imposters.Add(new CustomerImposter().Build());
+            _imposters.Add(new PurchaseOrdersWithQueryStringImposter().Build());
 
             return _imposters.ToArray();
         }

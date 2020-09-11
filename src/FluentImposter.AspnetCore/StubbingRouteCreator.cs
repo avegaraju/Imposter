@@ -11,46 +11,56 @@ using Microsoft.Extensions.Primitives;
 
 namespace FluentImposter.AspnetCore
 {
-    public class StubbingRouteCreator: RouteCreatorBase,
-                                       IRouteCreator<IApplicationBuilder>
+    public class StubbingRouteCreator: IRouteCreator<IApplicationBuilder>
     {
         private readonly ImpostersAsStubConfiguration _configuration;
         private readonly ImposterRulesEvaluator _rulesEvaluator;
+        private readonly IImposterRoute _imposterRoute;
 
-        public StubbingRouteCreator(ImpostersAsStubConfiguration configuration,
-                                    ImposterRulesEvaluator rulesEvaluator)
+        public StubbingRouteCreator(
+            ImpostersAsStubConfiguration configuration,
+            ImposterRulesEvaluator rulesEvaluator,
+            IImposterRoute imposterRoute
+            )
         {
             _configuration = configuration;
             _rulesEvaluator = rulesEvaluator;
+            _imposterRoute = imposterRoute;
         }
 
         public void CreateRoutes(IApplicationBuilder applicationBuilder)
         {
-            base.CreateImposterResourceRoutes(applicationBuilder,
-                                              _configuration.Imposters,
-                                              EvaluateImposterRules);
+            _imposterRoute.CreateImposterResourceRoutes(
+                applicationBuilder,
+                _configuration.Imposters,
+                EvaluateImposterRules
+            );
 
             RequestDelegate EvaluateImposterRules(Imposter imposter)
             {
                 return async context =>
-                       {
-                           await EvaluateRules(imposter, context);
-                       };
+                {
+                    await EvaluateRules(imposter, context);
+                };
             }
 
             async Task EvaluateRules(Imposter imposter,
-                                     HttpContext context)
+                HttpContext context)
             {
                 var request = BuildRequest(context);
 
-                var (response, _) = _rulesEvaluator.EvaluateRules(imposter,
-                                                                  context,
-                                                                  request);
+                var (response, _)
+                    = _rulesEvaluator.EvaluateRules(
+                        imposter,
+                        context,
+                        request
+                    );
 
                 context.Response.StatusCode = response.StatusCode;
                 await context.Response.WriteAsync(response.Content);
             }
         }
+        
 
         private static Request BuildRequest(HttpContext context)
         {

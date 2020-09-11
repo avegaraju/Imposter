@@ -10,8 +10,11 @@ namespace FluentImposter.AspnetCore
                                             ImpostersAsMockConfiguration impostersAsMockConfiguration)
         {
             var mockingRouteCreator =
-                    new MockingRouteCreator(impostersAsMockConfiguration,
-                                            new ImposterRulesEvaluator());
+                new MockingRouteCreator(
+                    impostersAsMockConfiguration,
+                    new ImposterRulesEvaluator(),
+                    new ImposterRoute()
+                );
 
             mockingRouteCreator.CreateRoutes(applicationBuilder);
 
@@ -21,8 +24,11 @@ namespace FluentImposter.AspnetCore
                                             ImpostersAsStubConfiguration impostersAsStubConfiguration)
         {
             var stubbingRouteCreator =
-                    new StubbingRouteCreator(impostersAsStubConfiguration,
-                                             new ImposterRulesEvaluator());
+                new StubbingRouteCreator(
+                    impostersAsStubConfiguration,
+                    new ImposterRulesEvaluator(),
+                    new ImposterRoute()
+                );
 
             stubbingRouteCreator.CreateRoutes(applicationBuilder);
         }

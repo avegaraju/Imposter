@@ -20,53 +20,55 @@ using Newtonsoft.Json;
 
 namespace FluentImposter.AspnetCore
 {
-    public class MockingRouteCreator: RouteCreatorBase,
-                                      IRouteCreator<IApplicationBuilder>
+    public class MockingRouteCreator:  IRouteCreator<IApplicationBuilder>
     {
         private readonly ImpostersAsMockConfiguration _configuration;
         private readonly ImposterRulesEvaluator _rulesEvaluator;
+        private readonly IImposterRoute _imposterRoute;
 
-        public MockingRouteCreator(ImpostersAsMockConfiguration configuration,
-                                   ImposterRulesEvaluator rulesEvaluator)
+        public MockingRouteCreator(
+            ImpostersAsMockConfiguration configuration,
+            ImposterRulesEvaluator rulesEvaluator,
+            IImposterRoute imposterRoute
+            )
         {
             _configuration = configuration;
             _rulesEvaluator = rulesEvaluator;
+            _imposterRoute = imposterRoute;
         }
 
         public void CreateRoutes(IApplicationBuilder applicationBuilder)
         {
             CreateRoutesForMocking(applicationBuilder);
-            CreateImposterResources(applicationBuilder);
+
+            _imposterRoute.CreateImposterResourceRoutes(
+                applicationBuilder,
+                _configuration.Imposters,
+                EvaluateImposterRules
+            );
         }
 
-        private void CreateImposterResources(IApplicationBuilder applicationBuilder)
+        private RequestDelegate EvaluateImposterRules(Imposter imposter)
         {
-            base.CreateImposterResourceRoutes(applicationBuilder,
-                                              _configuration.Imposters,
-                                              EvaluateImposterRules);
-
-            RequestDelegate EvaluateImposterRules(Imposter imposter)
+            return async context =>
             {
-                return async context =>
-                       {
-                           await EvaluateRules(imposter, context);
-                       };
-            }
+                await EvaluateRules(imposter, context);
+            };
+        }
 
-            async Task EvaluateRules(Imposter imposter,
-                                     HttpContext context)
-            {
-                var request = BuildRequest(context);
+        private async Task EvaluateRules(Imposter imposter,
+            HttpContext context)
+        {
+            var request = BuildRequest(context);
 
-                var (response, matchedCondition) = _rulesEvaluator.EvaluateRules(imposter,
-                                                                                 context,
-                                                                                 request);
+            var (response, matchedCondition) = _rulesEvaluator.EvaluateRules(imposter,
+                context,
+                request);
 
-                StoreRequestAndResponse(imposter, request, response, matchedCondition);
+            StoreRequestAndResponse(imposter, request, response, matchedCondition);
 
-                context.Response.StatusCode = response.StatusCode;
-                await context.Response.WriteAsync(response.Content);
-            }
+            context.Response.StatusCode = response.StatusCode;
+            await context.Response.WriteAsync(response.Content);
         }
 
         private static Request BuildRequest(HttpContext context)

@@ -8,9 +8,18 @@ using Microsoft.AspNetCore.Routing;
 
 namespace FluentImposter.AspnetCore
 {
-    public class RouteCreatorBase
+    public interface IImposterRoute
     {
-        protected void CreateImposterResourceRoutes(IApplicationBuilder applicationBuilder,
+        void CreateImposterResourceRoutes(
+            IApplicationBuilder applicationBuilder,
+            Imposter[] imposters,
+            Func<Imposter, RequestDelegate> rulesEvaluator
+        );
+    }
+
+    public class ImposterRoute: IImposterRoute
+    {
+        public void CreateImposterResourceRoutes(IApplicationBuilder applicationBuilder,
                                                     Imposter[] imposters,
                                                     Func<Imposter,RequestDelegate> rulesEvaluator)
         {

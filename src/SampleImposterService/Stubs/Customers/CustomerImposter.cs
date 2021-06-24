@@ -5,15 +5,16 @@ using FluentImposter.Core.Entities;
 
 namespace ImpostersServiceSample.Stubs.Customers
 {
-    public class CustomerImposter: IImposter
+    public class CustomerImposter
     {
         public RestImposter Build()
         {
             return new ImposterDefinition("CustomersStub")
-                    .DeclareResource("/api/Customers", HttpMethod.Post)
-                    .When(r => r.Content.Contains("Name:Jack"))
-                    .Then(new FailedToCreateCustomerResponseCreator())
-                    .Build();
+                .ForRest()
+                .DeclareResource("/api/Customers", HttpMethod.Post)
+                .When(r => r.Content.Contains("Name:Jack"))
+                .Then(new FailedToCreateCustomerResponseCreator())
+                .Build();
         }
     }
 }

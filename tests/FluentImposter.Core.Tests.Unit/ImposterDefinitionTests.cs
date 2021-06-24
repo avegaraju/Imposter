@@ -18,8 +18,10 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
-                                             .Build();
+            var imposter = imposterDefinition
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .Build();
 
             imposter.Method
                     .Should().Be(HttpMethod.Post);
@@ -30,10 +32,12 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
-                                             .When(r => r.Content.Contains(""))
-                                             .Then(new DefaultResponseCreator())
-                                             .Build();
+            var imposter = imposterDefinition
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.Content.Contains(""))
+                .Then(new DefaultResponseCreator())
+                .Build();
 
             Expression<Func<Request, bool>> expectedCondition = r => r.Content.Contains("");
 
@@ -46,12 +50,13 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
-                                             .When(r => r.Content.Contains(""))
-                                             .Then(new DefaultResponseCreator())
-                                             .When(r => r.Content.StartsWith("test"))
-                                             .Then(new TestResponseCreator())
-                                             .Build();
+            var imposter = imposterDefinition.ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.Content.Contains(""))
+                .Then(new DefaultResponseCreator())
+                .When(r => r.Content.StartsWith("test"))
+                .Then(new TestResponseCreator())
+                .Build();
 
             var firstRule = new Rule();
             firstRule.SetCondition(r => r.Content.Contains(""));
@@ -74,10 +79,11 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
-                                             .When(r => r.RequestHeader.Contains("Accept"))
-                                             .Then(new DefaultResponseCreator())
-                                             .Build();
+            var imposter = imposterDefinition.ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.RequestHeader.Contains("Accept"))
+                .Then(new DefaultResponseCreator())
+                .Build();
 
             Expression<Func<Request, bool>> requestCondition = r => r.RequestHeader.Contains("Accept");
 
@@ -90,10 +96,11 @@ namespace FluentImposter.Core.Tests.Unit
         {
             ImposterDefinition imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.DeclareResource("/test", HttpMethod.Post)
-                                             .When(r => r.Content.Contains(""))
-                                             .Then(new DefaultResponseCreator())
-                                             .Build();
+            var imposter = imposterDefinition.ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.Content.Contains(""))
+                .Then(new DefaultResponseCreator())
+                .Build();
 
             var expectedAction = new DefaultResponseCreator();
 
@@ -102,17 +109,17 @@ namespace FluentImposter.Core.Tests.Unit
         }
 
         [Fact]
-        public void ImposterDefinition_CreatesRestImposter()
+        public void ImposterDefinition_AllowsToDefineRestImposter()
         {
             var imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.ForRest();
+            var restResource= imposterDefinition.ForRest();
             
-            imposter.Should().BeOfType<RestImposter>();
+            restResource.Should().BeOfType<RestResource>();
         }
 
         [Fact]
-        public void ImposterDefinition_CreatesSmtpImposter()
+        public void ImposterDefinition_AllowsToDefineSmtpImposter()
         {
             var imposterDefinition = CreateSut();
 

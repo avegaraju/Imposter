@@ -5,7 +5,7 @@ using FluentImposter.Core.Entities;
 
 namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
 {
-    internal class FakeImposterWithRequestContent : IImposter
+    internal class FakeImposterWithRequestContent
     {
         private readonly HttpMethod _httpMethod;
 
@@ -16,10 +16,11 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         public RestImposter Build()
         {
             return new ImposterDefinition("test")
-                    .DeclareResource("test", _httpMethod)
-                    .When(r => r.Content.Contains("dummy"))
-                    .Then(new DummyResponseCreator())
-                    .Build();
+                .ForRest()
+                .DeclareResource("test", _httpMethod)
+                .When(r => r.Content.Contains("dummy"))
+                .Then(new DummyResponseCreator())
+                .Build();
         }
     }
 }

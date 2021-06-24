@@ -1,6 +1,6 @@
 ﻿namespace FluentImposter.Core.Entities
 {
-    public class SmtpImposter: IImposter
+    public class SmtpImposter
     {
     }
 }

@@ -20,11 +20,12 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
-                                                  "match this text"))
-                    .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
+                                              "match this text"))
+                .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
+                .Build();
 
             var request = new RequestBuilder()
                     .WithRequestContent("test content")
@@ -42,17 +43,18 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new []
-                                                                              {
-                                                                                  "text/plain",
-                                                                                  "test/xml"
-                                                                              }))
-                    .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new[]
+                {
+                    "text/plain",
+                    "test/xml"
+                }))
+                .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
+                .Build();
 
             var request = new RequestBuilder()
-                    .Build();
+                .Build();
 
             var response = RulesEvaluator.Evaluate(imposter, request, out _);
 
@@ -66,11 +68,12 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "None of evaluators could create a response.";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
-                                                  "match this text"))
-                    .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.Content.Contains("none of the imposter conditions will be able to " +
+                                              "match this text"))
+                .Then(new DummyResponseCreator(responseContent, INTERNAL_SERVER_ERROR))
+                .Build();
 
             var request = new RequestBuilder()
                     .Build();
@@ -88,10 +91,11 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.Content.Contains(requestContent))
-                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.Content.Contains(requestContent))
+                .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                .Build();
 
             var request = new RequestBuilder()
                     .WithRequestContent(requestContent)
@@ -116,10 +120,11 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
-                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
+                .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                .Build();
 
             var request = new RequestBuilder()
                     .WithRequestHeader(headerKey, headerValues)
@@ -145,12 +150,13 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response.";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
-                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
-                    .When(r=> r.Content.Contains(requestContent))
-                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
+                .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                .When(r => r.Content.Contains(requestContent))
+                .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                .Build();
 
             var request = new RequestBuilder()
                     .WithRequestHeader(headerKey, headerValues)
@@ -177,12 +183,13 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response for matched header";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
-                    .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
-                    .When(r => r.Content.Contains(requestContent))
-                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.RequestHeader.ContainsKeyAndValues(headerKey, headerValues))
+                .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
+                .When(r => r.Content.Contains(requestContent))
+                .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                .Build();
 
             var request = new RequestBuilder()
                     .WithRequestHeader(headerKey, headerValues)
@@ -209,12 +216,13 @@ namespace FluentImposter.Core.Tests.Unit
             string responseContent = "dummy response for matched header";
 
             var imposter = new ImposterDefinition("test")
-                    .DeclareResource("/test", HttpMethod.Post)
-                    .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new[]{"test"}))
-                    .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
-                    .When(r => r.Content.Contains(requestContent))
-                    .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
-                    .Build();
+                .ForRest()
+                .DeclareResource("/test", HttpMethod.Post)
+                .When(r => r.RequestHeader.ContainsKeyAndValues("Accept", new[] {"test"}))
+                .Then(new DummyResponseForMatchedHeader(responseContent, STATUS_CODE_OK))
+                .When(r => r.Content.Contains(requestContent))
+                .Then(new DummyResponseCreator(responseContent, STATUS_CODE_OK))
+                .Build();
 
             var request = new RequestBuilder()
                     .WithRequestHeader(headerKey, headerValues)

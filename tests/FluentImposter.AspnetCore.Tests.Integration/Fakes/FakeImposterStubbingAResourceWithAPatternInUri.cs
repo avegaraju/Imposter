@@ -16,10 +16,11 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         public RestImposter Build()
         {
             return new ImposterDefinition("test")
-                    .DeclareResource("products/{productId}", _httpMethod)
-                    .When(r => r.Content.Contains("dummy"))
-                    .Then(new DummyResponseCreator())
-                    .Build();
+                .ForRest()
+                .DeclareResource("products/{productId}", _httpMethod)
+                .When(r => r.Content.Contains("dummy"))
+                .Then(new DummyResponseCreator())
+                .Build();
         }
     }
 }

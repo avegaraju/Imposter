@@ -5,7 +5,7 @@ using System.Net.Http;
 
 namespace FluentImposter.Core.Entities
 {
-    public class RestImposter: IImposter
+    public class RestImposter
     {
         private Rule _newRule;
         private readonly List<Rule> _rules;

@@ -15,20 +15,14 @@ namespace FluentImposter.Core.Entities
             _imposterName = imposterName;
         }
 
-        public ImposterRule DeclareResource(string resourcePath, HttpMethod httpMethod)
+        public RestResource ForRest()
         {
-            _restImposter.SetResource(resourcePath);
-            _restImposter.SetMethod(httpMethod);
-
-            return new ImposterRule(_restImposter);
+            var imposter =  new RestImposter(_imposterName);
+         
+            return new RestResource(imposter);
         }
 
-        public IImposter ForRest()
-        {
-            return new RestImposter(_imposterName);
-        }
-
-        public IImposter ForSmtp()
+        public SmtpImposter ForSmtp()
         {
             return new SmtpImposter();
         }

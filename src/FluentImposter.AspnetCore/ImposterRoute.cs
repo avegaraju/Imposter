@@ -12,16 +12,16 @@ namespace FluentImposter.AspnetCore
     {
         void CreateImposterResourceRoutes(
             IApplicationBuilder applicationBuilder,
-            Imposter[] imposters,
-            Func<Imposter, RequestDelegate> rulesEvaluator
+            RestImposter[] imposters,
+            Func<RestImposter, RequestDelegate> rulesEvaluator
         );
     }
 
     public class ImposterRoute: IImposterRoute
     {
         public void CreateImposterResourceRoutes(IApplicationBuilder applicationBuilder,
-                                                    Imposter[] imposters,
-                                                    Func<Imposter,RequestDelegate> rulesEvaluator)
+                                                    RestImposter[] imposters,
+                                                    Func<RestImposter,RequestDelegate> rulesEvaluator)
         {
             foreach (var imposter in imposters)
             {

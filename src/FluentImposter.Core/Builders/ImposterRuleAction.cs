@@ -4,9 +4,9 @@ namespace FluentImposter.Core.Builders
 {
     public class ImposterRuleAction
     {
-        private readonly Imposter _imposter;
+        private readonly RestImposter _imposter;
 
-        public ImposterRuleAction(Imposter imposter)
+        public ImposterRuleAction(RestImposter imposter)
         {
             _imposter = imposter;
         }

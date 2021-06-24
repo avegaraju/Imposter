@@ -11,9 +11,9 @@ namespace ImpostersServiceSample.Stubs
 {
     public class StubImpostersBuilder
     {
-        private readonly IList<Imposter> _imposters = new List<Imposter>();
+        private readonly IList<RestImposter> _imposters = new List<RestImposter>();
 
-        public Imposter[] CreateStubImposters()
+        public RestImposter[] CreateStubImposters()
         {
             _imposters.Add(new OrdersImposter().Build());
             _imposters.Add(new CustomerImposter().Build());

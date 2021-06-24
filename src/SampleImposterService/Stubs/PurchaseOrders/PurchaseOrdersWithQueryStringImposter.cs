@@ -7,7 +7,7 @@ namespace ImpostersServiceSample.Stubs.PurchaseOrders
 {
     public class PurchaseOrdersWithQueryStringImposter: IImposter
     {
-        public Imposter Build()
+        public RestImposter Build()
         {
             //For url pattern : /api/PurchaseOrders/?isDemandOrder=true
             return new ImposterDefinition("PurchaseOrderWithQueryStringImposter")

@@ -48,7 +48,7 @@ namespace FluentImposter.AspnetCore
             );
         }
 
-        private RequestDelegate EvaluateImposterRules(Imposter imposter)
+        private RequestDelegate EvaluateImposterRules(RestImposter imposter)
         {
             return async context =>
             {
@@ -56,7 +56,7 @@ namespace FluentImposter.AspnetCore
             };
         }
 
-        private async Task EvaluateRules(Imposter imposter,
+        private async Task EvaluateRules(RestImposter imposter,
             HttpContext context)
         {
             var request = BuildRequest(context);
@@ -98,7 +98,7 @@ namespace FluentImposter.AspnetCore
             }
         }
 
-        private void StoreRequestAndResponse(Imposter imposter,
+        private void StoreRequestAndResponse(RestImposter imposter,
                                              Request request,
                                              Response response,
                                              Expression<Func<Request, bool>> matchedCondition)

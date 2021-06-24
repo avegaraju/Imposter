@@ -9,7 +9,7 @@ namespace ImpostersServiceSample.Mocks.Products
 {
     public class ProductsImposter : IImposter
     {
-        public Imposter Build()
+        public RestImposter Build()
         {
             return new ImposterDefinition("ProductsMock")
                     .DeclareResource("/api/Products", HttpMethod.Post)

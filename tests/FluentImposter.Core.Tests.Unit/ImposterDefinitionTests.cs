@@ -101,26 +101,24 @@ namespace FluentImposter.Core.Tests.Unit
                     .Should().BeEquivalentTo(expectedAction.CreateResponse());
         }
 
-        [Theory]
-        [InlineData(ImposterOfType.Rest)]
-        [InlineData(ImposterOfType.Smtp)]
-        public void ImposterDefinition_AllowsToChooseImposterType(ImposterOfType type)
+        [Fact]
+        public void ImposterDefinition_CreatesRestImposter()
         {
             var imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.OfType(type);
+            var imposter = imposterDefinition.ForRest();
+            
+            imposter.Should().BeOfType<RestImposter>();
+        }
 
-            using var scope = new AssertionScope();
+        [Fact]
+        public void ImposterDefinition_CreatesSmtpImposter()
+        {
+            var imposterDefinition = CreateSut();
 
-            switch (type)
-            {
-                case ImposterOfType.Rest:
-                    imposter.Should().BeOfType<RestImposter>();
-                    break;
-                case ImposterOfType.Smtp:
-                    imposter.Should().BeOfType<SmtpImposter>();
-                    break;
-            }
+            var imposter = imposterDefinition.ForSmtp();
+
+            imposter.Should().BeOfType<SmtpImposter>();
         }
 
         private static ImposterDefinition CreateSut()

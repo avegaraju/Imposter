@@ -36,7 +36,7 @@ namespace FluentImposter.AspnetCore
                 EvaluateImposterRules
             );
 
-            RequestDelegate EvaluateImposterRules(Imposter imposter)
+            RequestDelegate EvaluateImposterRules(RestImposter imposter)
             {
                 return async context =>
                 {
@@ -44,7 +44,7 @@ namespace FluentImposter.AspnetCore
                 };
             }
 
-            async Task EvaluateRules(Imposter imposter,
+            async Task EvaluateRules(RestImposter imposter,
                 HttpContext context)
             {
                 var request = BuildRequest(context);

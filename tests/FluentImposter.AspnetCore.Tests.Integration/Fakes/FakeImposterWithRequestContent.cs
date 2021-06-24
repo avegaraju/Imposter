@@ -13,7 +13,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
         {
             _httpMethod = httpMethod;
         }
-        public Imposter Build()
+        public RestImposter Build()
         {
             return new ImposterDefinition("test")
                     .DeclareResource("test", _httpMethod)

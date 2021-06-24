@@ -9,9 +9,9 @@ namespace ImpostersServiceSample.Mocks
 {
     public class MockImpostersBuilder
     {
-        private readonly IList<Imposter> _imposters = new List<Imposter>();
+        private readonly IList<RestImposter> _imposters = new List<RestImposter>();
 
-        public Imposter[] CreateMockImposters()
+        public RestImposter[] CreateMockImposters()
         {
             _imposters.Add(new ProductsImposter().Build());
 

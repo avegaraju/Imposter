@@ -11,7 +11,7 @@ namespace FluentImposter.AspnetCore
     public class ImposterRulesEvaluator
     {
         public (Response response, Expression<Func<Request, bool>> matchedCondition)
-                EvaluateRules(Imposter imposter,
+                EvaluateRules(RestImposter imposter,
                               HttpContext context,
                               Request request)
         {

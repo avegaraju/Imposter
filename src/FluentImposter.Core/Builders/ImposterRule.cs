@@ -7,9 +7,9 @@ namespace FluentImposter.Core.Builders
 {
     public class ImposterRule
     {
-        private readonly Imposter _imposter;
+        private readonly RestImposter _imposter;
 
-        public ImposterRule(Imposter imposter)
+        public ImposterRule(RestImposter imposter)
         {
             _imposter = imposter;
         }
@@ -21,7 +21,7 @@ namespace FluentImposter.Core.Builders
             return new ImposterRuleAction(_imposter);
         }
 
-        public Imposter Build()
+        public RestImposter Build()
         {
             return _imposter;
         }

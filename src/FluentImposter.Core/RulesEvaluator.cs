@@ -7,7 +7,7 @@ namespace FluentImposter.Core
 {
     internal static class RulesEvaluator
     {
-        public static Response Evaluate(Imposter imposter, Request request, out Expression<Func<Request, bool>> matchedCondition)
+        public static Response Evaluate(RestImposter imposter, Request request, out Expression<Func<Request, bool>> matchedCondition)
         {
             foreach (var imposterRule in imposter.Rules)
             {

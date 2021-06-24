@@ -32,7 +32,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
             return _testServer;
         }
 
-        public TestServerBuilder UsingImpostersMiddleware(Imposter imposter)
+        public TestServerBuilder UsingImpostersMiddleware(RestImposter imposter)
         {
             var impostersAsStubConfiguration = new ImpostersAsStubConfiguration(new[]
                                                                   {
@@ -47,7 +47,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
             return this;
         }
 
-        public TestServerBuilder UsingImposterMiddleWareWithSpyDataStore(Imposter imposter,
+        public TestServerBuilder UsingImposterMiddleWareWithSpyDataStore(RestImposter imposter,
                                                                             IDataStore spyDataStore)
         {
             var imposterConfiguration = new ImpostersAsMockConfiguration(new[]

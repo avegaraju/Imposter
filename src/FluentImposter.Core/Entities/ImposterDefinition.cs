@@ -7,35 +7,30 @@ namespace FluentImposter.Core.Entities
 {
     public class ImposterDefinition
     {
-        private readonly Imposter _imposter;
+        private readonly string _imposterName;
+        private RestImposter _restImposter;
 
         public ImposterDefinition(string imposterName)
         {
-            _imposter = new Imposter(imposterName);
+            _imposterName = imposterName;
         }
 
         public ImposterRule DeclareResource(string resourcePath, HttpMethod httpMethod)
         {
-            _imposter.SetResource(resourcePath);
-            _imposter.SetMethod(httpMethod);
+            _restImposter.SetResource(resourcePath);
+            _restImposter.SetMethod(httpMethod);
 
-            return new ImposterRule(_imposter);
+            return new ImposterRule(_restImposter);
         }
 
-        public IImposter OfType(ImposterOfType type)
+        public IImposter ForRest()
         {
-            IImposter imposter = null;
-            switch(type)
-            {
-                case ImposterOfType.Rest:
-                    imposter = new RestImposter();
-                    break;
-                case ImposterOfType.Smtp:
-                    imposter = new SmtpImposter();
-                    break;
-            }
+            return new RestImposter(_imposterName);
+        }
 
-            return imposter;
+        public IImposter ForSmtp()
+        {
+            return new SmtpImposter();
         }
     }
 }

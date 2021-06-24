@@ -4,9 +4,9 @@ namespace FluentImposter.Core
 {
     public class ImpostersAsStubConfiguration
     {
-        public Imposter[] Imposters { get; }
+        public RestImposter[] Imposters { get; }
 
-        public ImpostersAsStubConfiguration(Imposter[] imposters)
+        public ImpostersAsStubConfiguration(RestImposter[] imposters)
         {
             Imposters = imposters;
         }

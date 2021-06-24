@@ -7,7 +7,7 @@ namespace ImpostersServiceSample.Stubs.Orders
 {
     public class OrdersImposter: IImposter
     {
-        public Imposter Build()
+        public RestImposter Build()
         {
             return new ImposterDefinition("OrdersStub")
                     .DeclareResource("/api/Orders", HttpMethod.Post)

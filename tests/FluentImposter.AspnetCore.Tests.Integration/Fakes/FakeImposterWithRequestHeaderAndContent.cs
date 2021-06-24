@@ -7,7 +7,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration.Fakes
 {
     internal class FakeImposterWithRequestHeaderAndContent: IImposter
     {
-        public Imposter Build()
+        public RestImposter Build()
         {
             return new ImposterDefinition("test")
                     .DeclareResource("test", HttpMethod.Post)

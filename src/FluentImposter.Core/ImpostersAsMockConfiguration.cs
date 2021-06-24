@@ -4,10 +4,10 @@ namespace FluentImposter.Core
 {
     public class ImpostersAsMockConfiguration
     {
-        public Imposter[] Imposters { get;}
+        public RestImposter[] Imposters { get;}
         internal IDataStore DataStore { get;} 
 
-        public ImpostersAsMockConfiguration(Imposter[] imposters,
+        public ImpostersAsMockConfiguration(RestImposter[] imposters,
                                            IDataStore dataStore)
         {
             Imposters = imposters;

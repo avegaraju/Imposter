@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
-
+using System.Net.Mail;
 using FluentAssertions;
-
+using FluentAssertions.Execution;
 using FluentImposter.Core.Entities;
 
 using Xunit;
@@ -99,6 +99,28 @@ namespace FluentImposter.Core.Tests.Unit
 
             imposter.Rules.First().ResponseCreatorAction.CreateResponse()
                     .Should().BeEquivalentTo(expectedAction.CreateResponse());
+        }
+
+        [Theory]
+        [InlineData(ImposterOfType.Rest)]
+        [InlineData(ImposterOfType.Smtp)]
+        public void ImposterDefinition_AllowsToChooseImposterType(ImposterOfType type)
+        {
+            var imposterDefinition = CreateSut();
+
+            var imposter = imposterDefinition.OfType(type);
+
+            using var scope = new AssertionScope();
+
+            switch (type)
+            {
+                case ImposterOfType.Rest:
+                    imposter.Should().BeOfType<RestImposter>();
+                    break;
+                case ImposterOfType.Smtp:
+                    imposter.Should().BeOfType<SmtpImposter>();
+                    break;
+            }
         }
 
         private static ImposterDefinition CreateSut()

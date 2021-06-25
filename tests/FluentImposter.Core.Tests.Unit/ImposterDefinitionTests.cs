@@ -123,9 +123,39 @@ namespace FluentImposter.Core.Tests.Unit
         {
             var imposterDefinition = CreateSut();
 
-            var imposter = imposterDefinition.ForSmtp();
+            var smtpServer = imposterDefinition.ForSmtp();
 
-            imposter.Should().BeOfType<SmtpImposter>();
+            smtpServer.Should().BeOfType<SmtpServer>();
+        }
+
+        [Fact]
+        public void ImposterDefinition_AllowsToCreateASmtpServerAtAUri()
+        {
+            var expected = new Uri("http://localhost");
+
+            var imposterDefinition = CreateSut();
+
+            var smtpServer = imposterDefinition
+                .ForSmtp()
+                .CreateServer(expected);
+
+            smtpServer.SmtpServerUri.Should().Be(expected);
+        }
+
+        [Fact]
+        public void ImposterDefinition_AllowsToDefineAPortForSmtpServer()
+        {
+            var uri = new Uri("http://localhost");
+            uint expectedPort = 225;
+
+            var imposterDefinition = CreateSut();
+
+            var smtpServer = imposterDefinition
+                .ForSmtp()
+                .CreateServer(uri)
+                .AtPort(expectedPort);
+
+            smtpServer.Port.Should().Be(expectedPort);
         }
 
         private static ImposterDefinition CreateSut()

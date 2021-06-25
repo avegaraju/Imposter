@@ -5,19 +5,19 @@ namespace FluentImposter.Core.Entities
 {
     public class RestResource
     {
-        private readonly RestImposter _imposter;
+        private readonly RestImposter _restImposter;
 
-        public RestResource(RestImposter imposter)
+        public RestResource(string imposterName)
         {
-            _imposter = imposter;
+            _restImposter = new RestImposter(imposterName);
         }
 
         public ImposterRule DeclareResource(string resourcePath, HttpMethod httpMethod)
         {
-            _imposter.SetResource(resourcePath);
-            _imposter.SetMethod(httpMethod);
+            _restImposter.SetResource(resourcePath);
+            _restImposter.SetMethod(httpMethod);
 
-            return new ImposterRule(_imposter);
+            return new ImposterRule(_restImposter);
         }
     }
 }

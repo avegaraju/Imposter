@@ -1,14 +1,8 @@
-﻿using System.Diagnostics;
-using System.Net.Http;
-
-using FluentImposter.Core.Builders;
-
-namespace FluentImposter.Core.Entities
+﻿namespace FluentImposter.Core.Entities
 {
     public class ImposterDefinition
     {
         private readonly string _imposterName;
-        private RestImposter _restImposter;
 
         public ImposterDefinition(string imposterName)
         {
@@ -17,14 +11,12 @@ namespace FluentImposter.Core.Entities
 
         public RestResource ForRest()
         {
-            var imposter =  new RestImposter(_imposterName);
-         
-            return new RestResource(imposter);
+            return new RestResource(_imposterName);
         }
 
-        public SmtpImposter ForSmtp()
+        public SmtpServer ForSmtp()
         {
-            return new SmtpImposter();
+            return new SmtpServer(_imposterName);
         }
     }
 }

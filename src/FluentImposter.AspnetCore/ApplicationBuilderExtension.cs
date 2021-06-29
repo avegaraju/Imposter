@@ -1,5 +1,5 @@
 ﻿using FluentImposter.Core;
-
+using FluentImposter.Core.Entities;
 using Microsoft.AspNetCore.Builder;
 
 namespace FluentImposter.AspnetCore
@@ -7,13 +7,15 @@ namespace FluentImposter.AspnetCore
     public static class ApplicationBuilderExtension
     {
         public static void UseMockImposters(this IApplicationBuilder applicationBuilder,
-                                            ImpostersAsMockConfiguration impostersAsMockConfiguration)
+                                            RestImposter[] restImposters,
+                                            IDataStore dataStore)
         {
             var mockingRouteCreator =
                 new MockingRouteCreator(
-                    impostersAsMockConfiguration,
+                    restImposters,
                     new ImposterRulesEvaluator(),
-                    new ImposterRoute()
+                    new ImposterRoute(),
+                    dataStore
                 );
 
             mockingRouteCreator.CreateRoutes(applicationBuilder);
@@ -21,11 +23,11 @@ namespace FluentImposter.AspnetCore
         }
 
         public static void UseStubImposters(this IApplicationBuilder applicationBuilder,
-                                            ImpostersAsStubConfiguration impostersAsStubConfiguration)
+                                            RestImposter[] restImposters)
         {
             var stubbingRouteCreator =
                 new StubbingRouteCreator(
-                    impostersAsStubConfiguration,
+                    restImposters,
                     new ImposterRulesEvaluator(),
                     new ImposterRoute()
                 );

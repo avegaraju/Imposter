@@ -22,17 +22,19 @@ namespace FluentImposter.AspnetCore
 {
     public class MockingRouteCreator:  IRouteCreator<IApplicationBuilder>
     {
-        private readonly ImpostersAsMockConfiguration _configuration;
+        private readonly RestImposter[] _imposters;
+        private readonly IDataStore _dataStore;
         private readonly ImposterRulesEvaluator _rulesEvaluator;
         private readonly IImposterRoute _imposterRoute;
 
         public MockingRouteCreator(
-            ImpostersAsMockConfiguration configuration,
+            RestImposter[] imposters,
             ImposterRulesEvaluator rulesEvaluator,
-            IImposterRoute imposterRoute
+            IImposterRoute imposterRoute,
+            IDataStore dataStores
             )
         {
-            _configuration = configuration;
+            _imposters = imposters;
             _rulesEvaluator = rulesEvaluator;
             _imposterRoute = imposterRoute;
         }
@@ -43,7 +45,7 @@ namespace FluentImposter.AspnetCore
 
             _imposterRoute.CreateImposterResourceRoutes(
                 applicationBuilder,
-                _configuration.Imposters,
+                _imposters,
                 EvaluateImposterRules
             );
         }
@@ -103,11 +105,11 @@ namespace FluentImposter.AspnetCore
                                              Response response,
                                              Expression<Func<Request, bool>> matchedCondition)
         {
-            var requestId = _configuration.DataStore.StoreRequest(imposter.Resource,
+            var requestId = _dataStore.StoreRequest(imposter.Resource,
                                                                   imposter.Method,
                                                                   Encoding.ASCII.GetBytes(request.Content));
 
-            _configuration.DataStore.StoreResponse(requestId,
+            _dataStore.StoreResponse(requestId,
                                                    imposter.Name,
                                                    matchedCondition?.ToString(),
                                                    Encoding.ASCII.GetBytes(response.Content));
@@ -153,7 +155,7 @@ namespace FluentImposter.AspnetCore
             {
                 var verificationRequest = GetVerificationRequest(context);
 
-                return _configuration.DataStore.GetVerificationResponse(verificationRequest.Resource,
+                return _dataStore.GetVerificationResponse(verificationRequest.Resource,
                                                                         new HttpMethod(verificationRequest.HttpMethod),
                                                                         Encoding
                                                                                 .ASCII

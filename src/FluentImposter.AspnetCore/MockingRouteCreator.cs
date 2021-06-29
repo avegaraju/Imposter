@@ -24,19 +24,15 @@ namespace FluentImposter.AspnetCore
     {
         private readonly RestImposter[] _imposters;
         private readonly IDataStore _dataStore;
-        private readonly ImposterRulesEvaluator _rulesEvaluator;
-        private readonly IImposterRoute _imposterRoute;
+        private readonly ImposterRulesEvaluator _rulesEvaluator = new ImposterRulesEvaluator();
+        private readonly ImposterRoute _imposterRoute = new ImposterRoute();
 
         public MockingRouteCreator(
             RestImposter[] imposters,
-            ImposterRulesEvaluator rulesEvaluator,
-            IImposterRoute imposterRoute,
             IDataStore dataStore
             )
         {
             _imposters = imposters;
-            _rulesEvaluator = rulesEvaluator;
-            _imposterRoute = imposterRoute;
             _dataStore = dataStore;
         }
 

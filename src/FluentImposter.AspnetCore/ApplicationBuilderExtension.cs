@@ -10,13 +10,7 @@ namespace FluentImposter.AspnetCore
                                             RestImposter[] restImposters,
                                             IDataStore dataStore)
         {
-            var mockingRouteCreator =
-                new MockingRouteCreator(
-                    restImposters,
-                    new ImposterRulesEvaluator(),
-                    new ImposterRoute(),
-                    dataStore
-                );
+            var mockingRouteCreator = new MockingRouteCreator(restImposters, dataStore);
 
             mockingRouteCreator.CreateRoutes(applicationBuilder);
 
@@ -25,12 +19,7 @@ namespace FluentImposter.AspnetCore
         public static void UseStubImposters(this IApplicationBuilder applicationBuilder,
                                             RestImposter[] restImposters)
         {
-            var stubbingRouteCreator =
-                new StubbingRouteCreator(
-                    restImposters,
-                    new ImposterRulesEvaluator(),
-                    new ImposterRoute()
-                );
+            var stubbingRouteCreator = new StubbingRouteCreator(restImposters);
 
             stubbingRouteCreator.CreateRoutes(applicationBuilder);
         }

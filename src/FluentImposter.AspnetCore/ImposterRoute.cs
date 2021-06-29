@@ -8,30 +8,23 @@ using Microsoft.AspNetCore.Routing;
 
 namespace FluentImposter.AspnetCore
 {
-    public interface IImposterRoute
+    public class ImposterRoute
     {
-        void CreateImposterResourceRoutes(
+        public void CreateImposterResourceRoutes(
             IApplicationBuilder applicationBuilder,
             RestImposter[] imposters,
             Func<RestImposter, RequestDelegate> rulesEvaluator
-        );
-    }
-
-    public class ImposterRoute: IImposterRoute
-    {
-        public void CreateImposterResourceRoutes(IApplicationBuilder applicationBuilder,
-                                                    RestImposter[] imposters,
-                                                    Func<RestImposter,RequestDelegate> rulesEvaluator)
+        )
         {
             foreach (var imposter in imposters)
             {
                 applicationBuilder
-                        .UseRouter(routeBuilder =>
-                                   {
-                                       routeBuilder.MapVerb(imposter.Method.ToString(),
-                                                            imposter.Resource,
-                                                            rulesEvaluator(imposter));
-                                   });
+                    .UseRouter(routeBuilder =>
+                    {
+                        routeBuilder.MapVerb(imposter.Method.ToString(),
+                            imposter.Resource,
+                            rulesEvaluator(imposter));
+                    });
             }
         }
     }

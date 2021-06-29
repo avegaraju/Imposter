@@ -14,18 +14,12 @@ namespace FluentImposter.AspnetCore
     public class StubbingRouteCreator: IRouteCreator<IApplicationBuilder>
     {
         private readonly RestImposter[] _imposters;
-        private readonly ImposterRulesEvaluator _rulesEvaluator;
-        private readonly IImposterRoute _imposterRoute;
+        private readonly ImposterRulesEvaluator _rulesEvaluator = new ImposterRulesEvaluator();
+        private readonly ImposterRoute _imposterRoute = new ImposterRoute();
 
-        public StubbingRouteCreator(
-            RestImposter[] imposters,
-            ImposterRulesEvaluator rulesEvaluator,
-            IImposterRoute imposterRoute
-            )
+        public StubbingRouteCreator(RestImposter[] imposters)
         {
             _imposters = imposters;
-            _rulesEvaluator = rulesEvaluator;
-            _imposterRoute = imposterRoute;
         }
 
         public void CreateRoutes(IApplicationBuilder applicationBuilder)

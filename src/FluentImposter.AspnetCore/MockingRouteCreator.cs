@@ -42,7 +42,7 @@ namespace FluentImposter.AspnetCore
 
         public void CreateRoutes(IApplicationBuilder applicationBuilder)
         {
-            CreateRoutesForMocking(applicationBuilder);
+            CreateMockVerificationRoute(applicationBuilder);
 
             _imposterRoute.CreateImposterResourceRoutes(
                 applicationBuilder,
@@ -116,7 +116,7 @@ namespace FluentImposter.AspnetCore
                                                    Encoding.ASCII.GetBytes(response.Content));
         }
 
-        private void CreateRoutesForMocking(IApplicationBuilder applicationBuilder)
+        private void CreateMockVerificationRoute(IApplicationBuilder applicationBuilder)
         {
             applicationBuilder
                     .UseRouter(routeBuilder =>

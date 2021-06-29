@@ -31,12 +31,13 @@ namespace FluentImposter.AspnetCore
             RestImposter[] imposters,
             ImposterRulesEvaluator rulesEvaluator,
             IImposterRoute imposterRoute,
-            IDataStore dataStores
+            IDataStore dataStore
             )
         {
             _imposters = imposters;
             _rulesEvaluator = rulesEvaluator;
             _imposterRoute = imposterRoute;
+            _dataStore = dataStore;
         }
 
         public void CreateRoutes(IApplicationBuilder applicationBuilder)

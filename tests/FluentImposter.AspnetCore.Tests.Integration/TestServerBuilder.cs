@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Net;
-
-using FluentImposter.AspnetCore.Tests.Integration.Fakes;
-using FluentImposter.AspnetCore.Tests.Integration.Spies;
 using FluentImposter.Core;
 using FluentImposter.Core.Builders;
 using FluentImposter.Core.Entities;
-
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,15 +29,7 @@ namespace FluentImposter.AspnetCore.Tests.Integration
 
         public TestServerBuilder UsingImpostersMiddleware(RestImposter imposter)
         {
-            var impostersAsStubConfiguration = new ImpostersAsStubConfiguration(new[]
-                                                                  {
-                                                                      imposter
-                                                                  });
-
-            Action<IApplicationBuilder> action =
-                    app => app.UseStubImposters(impostersAsStubConfiguration);
-
-            _webHostBuilder.Configure(action);
+            _webHostBuilder.Configure(builder => builder.UseStubImposters(new[] { imposter }));
 
             return this;
         }
@@ -50,16 +37,12 @@ namespace FluentImposter.AspnetCore.Tests.Integration
         public TestServerBuilder UsingImposterMiddleWareWithSpyDataStore(RestImposter imposter,
                                                                             IDataStore spyDataStore)
         {
-            var imposterConfiguration = new ImpostersAsMockConfiguration(new[]
-                                                                         {
-                                                                             imposter
-                                                                         },
-                                                                         spyDataStore);
-
-            Action<IApplicationBuilder> action =
-                    app => app.UseMockImposters(imposterConfiguration);
-
-            _webHostBuilder.Configure(action);
+            _webHostBuilder.Configure(
+                builder => builder.UseMockImposters(
+                    new[] {imposter},
+                    spyDataStore
+                )
+            );
 
             return this;
         }

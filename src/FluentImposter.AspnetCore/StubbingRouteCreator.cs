@@ -32,7 +32,7 @@ namespace FluentImposter.AspnetCore
         {
             _imposterRoute.CreateImposterResourceRoutes(
                 applicationBuilder,
-                _configuration.Imposters,
+                _imposters,
                 EvaluateImposterRules
             );
 

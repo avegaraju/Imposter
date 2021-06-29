@@ -1,7 +1,4 @@
 ﻿using FluentImposter.AspnetCore;
-using FluentImposter.Core;
-
-using ImpostersServiceSample.Mocks;
 using ImpostersServiceSample.Stubs;
 
 using Microsoft.AspNetCore.Builder;
@@ -36,21 +33,16 @@ namespace ImpostersServiceSample
                 app.UseDeveloperExceptionPage();
             }
 
-            ImpostersAsStubConfiguration stubConfiguration =
-                    new ImpostersAsStubConfiguration(new StubImpostersBuilder()
-                                                             .CreateStubImposters());
-
-            app.UseStubImposters(stubConfiguration);
+            app.UseStubImposters(
+                new StubImpostersBuilder().CreateStubImposters()
+            );
 
             /*Uncomment below code when DynamoDB is available at http://localhost:8000*/
 
-            //ImpostersAsMockConfiguration mockConfiguration =
-            //        new ImpostersAsMockConfiguration(new MockImpostersBuilder()
-            //                                                 .CreateMockImposters(),
-            //                                         new MocksDataStore()
-            //                                                 .Create());
-
-            //app.UseMockImposters(mockConfiguration);
+            //app.UseMockImposters(
+            //    new MockImpostersBuilder().CreateMockImposters(),
+            //    new MocksDataStore().Create()
+            //);
 
             app.UseMvc();
         }

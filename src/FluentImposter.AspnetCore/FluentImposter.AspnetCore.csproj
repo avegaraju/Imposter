@@ -1,25 +1,39 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
     <PackageId>Appify.FluentImposter.AspnetCore</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Authors>Ashish Vegaraju</Authors>
-    <owners>Ashish Vegaraju</owners>
-    <PackageLicenseUrl>https://github.com/avegaraju/Imposter/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/avegaraju/Imposter</PackageProjectUrl>
-    <iconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</iconUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <description>Aspnet core middleware to spin up rest resources dynamically. This package is part of project Imposter which provides simple over the wire test doubles. Project Imposter allows to stub or mock a REST resource.</description>
-    <PackageReleaseNotes>Aspnet core middleware to spin up rest resources dynamically.</PackageReleaseNotes>
-    <copyright>Copyright 2018</copyright>
-    <PackageTags>Imposter, FluentImposter, test-doubles, over-the-wire, mocking, aspnetcore, fake, mocking-server</PackageTags>
+    <RepositoryUrl>https://github.com/avegaraju/Imposter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>ASP.NET Core middleware for FluentImposter. Dynamically create REST resource test doubles with routing integration. Supports both stubbing and mocking with request/response verification. Modernized for .NET 8.</Description>
+    <PackageReleaseNotes>Version 2.0: Modernized to .NET 8 with multi-targeting support. Updated to latest ASP.NET Core APIs. Improved performance and compatibility.</PackageReleaseNotes>
+    <Copyright>Copyright © 2018-2025 Ashish Vegaraju</Copyright>
+    <PackageTags>Imposter;FluentImposter;test-doubles;over-the-wire;mocking;aspnetcore;fake;mocking-server;dotnet8;middleware</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.1-beta3" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>

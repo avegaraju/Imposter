@@ -1,29 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
     <PackageId>Appify.FluentImposter.Core</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Authors>Ashish Vegaraju</Authors>
-    <owners>Ashish Vegaraju</owners>
-    <PackageLicenseUrl>https://github.com/avegaraju/Imposter/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/avegaraju/Imposter</PackageProjectUrl>
-    <iconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</iconUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <description>This package provides the core functionality for project Imposter. Project Imposter provides simple over the wire test doubles. Project Imposter allows to stub or mock a REST resource.</description>
-    <PackageReleaseNotes>The core funtionality.</PackageReleaseNotes>
-    <copyright>Copyright 2018</copyright>
-    <PackageTags>Imposter, FluentImposter, test-doubles, over-the-wire, mocking, aspnetcore, fake, mocking-server</PackageTags>
+    <RepositoryUrl>https://github.com/avegaraju/Imposter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>Core functionality for FluentImposter - a .NET library for creating over-the-wire test doubles. Provides simple stubbing and mocking of REST resources with a fluent API. Modernized for .NET 8 with backward compatibility.</Description>
+    <PackageReleaseNotes>Version 2.0: Modernized to .NET 8 with multi-targeting support. Improved performance and modern C# 12 features. Maintains backward compatibility with .NET Standard 2.0.</PackageReleaseNotes>
+    <Copyright>Copyright © 2018-2025 Ashish Vegaraju</Copyright>
+    <PackageTags>Imposter;FluentImposter;test-doubles;over-the-wire;mocking;aspnetcore;fake;mocking-server;dotnet8;testing</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="2.0.0" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Primitives">
-      <HintPath>..\..\packages\Microsoft.Extensions.Primitives.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

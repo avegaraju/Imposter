@@ -1,24 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
     <PackageId>Appify.FluentImposter.DataStore.AwsDynamoDb</PackageId>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Authors>Ashish Vegaraju</Authors>
-    <owners>Ashish Vegaraju</owners>
-    <PackageLicenseUrl>https://github.com/avegaraju/Imposter/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/avegaraju/Imposter</PackageProjectUrl>
-    <iconUrl>https://github.com/avegaraju/Imposter/blob/master/logo.png</iconUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <description>Enables to store mocking sessions in Amazon Aws DynamoDb for request/response verification. This package is part of project Imposter which provides simple over the wire test doubles. Project Imposter allows to stub or mock a REST resource.</description>
-    <PackageReleaseNotes>Enables to store mocking sessions in Amazon Aws DynamoDb for request/response verification.</PackageReleaseNotes>
-    <copyright>Copyright 2018</copyright>
-    <PackageTags>Imposter, FluentImposter, test-doubles, over-the-wire, mocking, aspnetcore, fake, mocking-server</PackageTags>
+    <RepositoryUrl>https://github.com/avegaraju/Imposter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Description>AWS DynamoDB data store for FluentImposter. Enables persistent storage of mock sessions for request/response verification. Supports stateful mocking scenarios with DynamoDB backend.</Description>
+    <PackageReleaseNotes>Version 2.0: Modernized to .NET 8 with multi-targeting support. Updated AWS SDK to latest version. Improved performance and async operations.</PackageReleaseNotes>
+    <Copyright>Copyright © 2018-2025 Ashish Vegaraju</Copyright>
+    <PackageTags>Imposter;FluentImposter;test-doubles;over-the-wire;mocking;aspnetcore;fake;mocking-server;dotnet8;aws;dynamodb</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.5" />
-    <PackageReference Include="ServiceStack.Aws.Core" Version="5.0.2" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.400.16" />
+    <PackageReference Include="ServiceStack.Aws" Version="8.5.0" />
   </ItemGroup>
 
   <ItemGroup>
